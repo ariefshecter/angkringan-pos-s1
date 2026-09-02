@@ -15,7 +15,16 @@ class MidtransWebhookController extends Controller
     {
         $payload = $request->all();
         $orderNumber = (string) ($payload['order_id'] ?? '');
-        $transaction = Transaction::query()->where('order_number', $orderNumber)->first();
+        $transaction = Transaction::query()
+            ->where(function ($query) use ($orderNumber): void {
+                $query->where('midtrans_order_id', $orderNumber)
+                    ->orWhereJsonContains('midtrans_order_id_history', $orderNumber)
+                    ->orWhere(function ($query) use ($orderNumber): void {
+                        $query->whereNull('midtrans_order_id')
+                            ->where('order_number', $orderNumber);
+                    });
+            })
+            ->first();
         $expectedSignature = hash('sha512',
             $orderNumber.
             ($payload['status_code'] ?? '').
@@ -23,6 +32,7 @@ class MidtransWebhookController extends Controller
             config('services.midtrans.server_key')
         );
         $isValid = $transaction
+            && $orderNumber !== ''
             && filled(config('services.midtrans.server_key'))
             && hash_equals($expectedSignature, (string) ($payload['signature_key'] ?? ''))
             && (int) round((float) ($payload['gross_amount'] ?? 0)) === $transaction->total;
@@ -52,7 +62,7 @@ class MidtransWebhookController extends Controller
                     'deny' => Transaction::PAYMENT_FAILED,
                     default => Transaction::PAYMENT_CANCELLED,
                 };
-                $orders->cancel($transaction, $mapped);
+                $orders->cancelFromMidtrans($transaction, $mapped, $payload);
             }
 
             $notification->update(['processed_at' => now()]);

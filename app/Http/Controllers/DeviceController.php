@@ -11,21 +11,19 @@ use Illuminate\View\View;
 
 class DeviceController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
         $devices = Device::query()
-            ->orderByRaw("CASE WHEN type = 'admin' THEN 0 ELSE 1 END")
+            ->where('type', Device::TYPE_KIOSK)
             ->orderBy('name')
             ->paginate(12);
 
         return view('admin.devices.index', [
             'devices' => $devices,
-            'currentDevice' => $request->attributes->get('device'),
             'summary' => [
-                'total' => Device::query()->count(),
-                'active' => Device::query()->where('is_active', true)->count(),
+                'total' => Device::query()->where('type', Device::TYPE_KIOSK)->count(),
                 'kiosks' => Device::query()->where('type', Device::TYPE_KIOSK)->where('is_active', true)->count(),
-                'admins' => Device::query()->where('type', Device::TYPE_ADMIN)->where('is_active', true)->count(),
+                'connected' => Device::query()->where('type', Device::TYPE_KIOSK)->whereNotNull('token_hash')->count(),
             ],
         ]);
     }
@@ -39,12 +37,12 @@ class DeviceController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('devices', 'name')],
-            'type' => ['required', Rule::in([Device::TYPE_KIOSK, Device::TYPE_ADMIN])],
         ]);
 
-        $code = $activationCodes->generate($validated['type']);
+        $code = $activationCodes->generate(Device::TYPE_KIOSK);
         $device = Device::query()->create([
             ...$validated,
+            'type' => Device::TYPE_KIOSK,
             'activation_code_hash' => $activationCodes->hash($code),
             'is_active' => true,
         ]);
@@ -54,11 +52,9 @@ class DeviceController extends Controller
             ->with('device_activation', $this->activationMessage($device, $code));
     }
 
-    public function regenerate(Request $request, Device $device, DeviceActivationCode $activationCodes): RedirectResponse
+    public function regenerate(Device $device, DeviceActivationCode $activationCodes): RedirectResponse
     {
-        if ($this->isCurrentDevice($request, $device)) {
-            return back()->with('error', 'Kode perangkat admin yang sedang digunakan tidak dapat direset.');
-        }
+        abort_unless($device->type === Device::TYPE_KIOSK, 404);
 
         $code = $activationCodes->generate($device->type);
         $device->update([
@@ -76,11 +72,9 @@ class DeviceController extends Controller
             ->with('device_activation', $this->activationMessage($device, $code));
     }
 
-    public function toggle(Request $request, Device $device, DeviceActivationCode $activationCodes): RedirectResponse
+    public function toggle(Device $device, DeviceActivationCode $activationCodes): RedirectResponse
     {
-        if ($this->isCurrentDevice($request, $device)) {
-            return back()->with('error', 'Perangkat admin yang sedang digunakan tidak dapat dinonaktifkan.');
-        }
+        abort_unless($device->type === Device::TYPE_KIOSK, 404);
 
         if ($device->is_active) {
             $device->update([
@@ -106,13 +100,6 @@ class DeviceController extends Controller
         return back()
             ->with('success', $device->name.' berhasil diaktifkan kembali.')
             ->with('device_activation', $this->activationMessage($device, $code));
-    }
-
-    private function isCurrentDevice(Request $request, Device $device): bool
-    {
-        $currentDevice = $request->attributes->get('device');
-
-        return $currentDevice instanceof Device && $currentDevice->is($device);
     }
 
     /** @return array{name: string, code: string} */

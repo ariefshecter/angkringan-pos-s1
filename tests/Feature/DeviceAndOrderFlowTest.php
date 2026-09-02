@@ -2,13 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\CartReservation;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Device;
+use App\Models\Kasir;
 use App\Models\Menu;
 use App\Models\Transaction;
-use App\Models\User;
 use App\Services\MidtransService;
+use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
@@ -30,6 +33,23 @@ class DeviceAndOrderFlowTest extends TestCase
         $this->post(route('device.activate.store'), [
             'activation_code' => 'kiosk-s1-2026',
         ])->assertRedirect(route('kiosk.index'))->assertCookie('device_token');
+    }
+
+    public function test_admin_device_code_can_not_be_used_on_kiosk_activation_page(): void
+    {
+        $device = Device::query()->create([
+            'name' => 'Legacy Admin Device',
+            'type' => Device::TYPE_ADMIN,
+            'activation_code_hash' => hash('sha256', 'ADMIN-S1-2026'),
+            'is_active' => true,
+        ]);
+
+        $this->post(route('device.activate.store'), [
+            'activation_code' => 'ADMIN-S1-2026',
+        ])->assertSessionHasErrors('activation_code');
+
+        $this->assertNotNull($device->fresh()->activation_code_hash);
+        $this->assertNull($device->token_hash);
     }
 
     public function test_unregistered_device_can_not_access_kiosk(): void
@@ -90,6 +110,12 @@ class DeviceAndOrderFlowTest extends TestCase
         ])->assertRedirect();
 
         $transaction = Transaction::query()->firstOrFail();
+        $this->assertDatabaseHas('user', [
+            'session_id' => $transaction->user_session_id,
+            'name' => 'Siti',
+        ]);
+        $this->assertSame('Siti', $transaction->customer->name);
+        $this->assertSame('Siti', $transaction->customer_name);
         $this->assertSame('midtrans', $transaction->payment_method);
         $this->assertSame('other_qris', $transaction->payment_channel);
         $this->assertSame('qris-snap-token', $transaction->midtrans_snap_token);
@@ -159,6 +185,39 @@ class DeviceAndOrderFlowTest extends TestCase
             ->assertDontSee('id="pay-button"', false);
     }
 
+    public function test_midtrans_creation_and_cancellation_failure_keeps_order_pending_and_reservation(): void
+    {
+        $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'minuman-create-failure']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Kopi Susu',
+            'slug' => 'kopi-susu-create-failure',
+            'price' => 5000,
+            'stock' => 10,
+        ]);
+        $midtrans = $this->mock(MidtransService::class);
+        $midtrans->shouldReceive('createSnapToken')
+            ->once()
+            ->andThrow(new \RuntimeException('Midtrans sedang tidak dapat dihubungi.'));
+        $midtrans->shouldReceive('cancelTransaction')
+            ->once()
+            ->andThrow(new \RuntimeException('Pembatalan Midtrans gagal.'));
+
+        $this->activateDevice(Device::TYPE_KIOSK)
+            ->post(route('kiosk.cart.store'), ['menu_id' => $menu->id, 'quantity' => 1]);
+        $response = $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Budi',
+            'payment_method' => 'qris',
+        ]);
+
+        $transaction = Transaction::query()->firstOrFail();
+        $response->assertRedirect(route('kiosk.orders.show', $transaction->order_number))
+            ->assertSessionHas('error', 'Pembayaran belum dapat dibatalkan di Midtrans. Pesanan tetap Pending dan stok tetap direservasi.');
+        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->fresh()->payment_status);
+        $this->assertSame(1, $menu->fresh()->reserved_stock);
+        $this->assertDatabaseCount('cart_reservations', 0);
+    }
+
     public function test_other_bank_uses_permata_virtual_account_with_interbank_instructions(): void
     {
         $category = Category::query()->create(['name' => 'Makanan', 'slug' => 'makanan']);
@@ -220,7 +279,7 @@ class DeviceAndOrderFlowTest extends TestCase
             'payment_channel' => 'gopay',
         ])->assertSessionHasErrors('payment_channel');
 
-        $this->assertDatabaseCount('transactions', 0);
+        $this->assertDatabaseCount('transaksi', 0);
     }
 
     public function test_kiosk_can_change_item_quantity_using_json_requests(): void
@@ -309,7 +368,7 @@ class DeviceAndOrderFlowTest extends TestCase
         $this->assertSame(2, $menu->fresh()->reserved_stock);
         $this->assertSame(10, $menu->fresh()->stock);
 
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
         $this->activateDevice(Device::TYPE_ADMIN)
             ->actingAs($admin)
             ->post(route('admin.orders.confirm-cash', $transaction))
@@ -320,7 +379,7 @@ class DeviceAndOrderFlowTest extends TestCase
         $this->assertSame(0, $menu->fresh()->reserved_stock);
     }
 
-    public function test_kiosk_can_cancel_its_pending_order_and_restore_cart_reservation(): void
+    public function test_kiosk_can_prepare_cash_payment_edit_without_creating_another_order(): void
     {
         $category = Category::query()->create(['name' => 'Makanan', 'slug' => 'makanan']);
         $menu = Menu::query()->create([
@@ -340,6 +399,8 @@ class DeviceAndOrderFlowTest extends TestCase
         ]);
 
         $transaction = Transaction::query()->firstOrFail();
+        $originalId = $transaction->id;
+        $originalOrderNumber = $transaction->order_number;
         $this->assertSame(2, $menu->fresh()->reserved_stock);
 
         $this->get(route('kiosk.orders.show', $transaction->order_number))
@@ -347,16 +408,28 @@ class DeviceAndOrderFlowTest extends TestCase
             ->assertSee('Pilih metode pembayaran lain')
             ->assertSee('Batalkan pesanan');
 
-        $this->post(route('kiosk.orders.cancel', $transaction->order_number))
+        $this->post(route('kiosk.orders.change-payment', $transaction->order_number))
             ->assertRedirect(route('kiosk.checkout.create'))
-            ->assertSessionHas('success', 'Pembayaran dibatalkan. Silakan pilih metode pembayaran lain.')
+            ->assertSessionHas('success', 'Pesanan yang sama siap diperbarui. Silakan pilih metode pembayaran baru.')
             ->assertSessionHasInput('customer_name', 'Budi')
-            ->assertSessionHas('cart', [$menu->id => 2]);
+            ->assertSessionMissing('cart');
 
-        $this->assertSame(Transaction::PAYMENT_CANCELLED, $transaction->fresh()->payment_status);
-        $this->assertSame(Transaction::ORDER_CANCELLED, $transaction->fresh()->order_status);
+        $transaction->refresh();
+        $this->assertSame($originalId, $transaction->id);
+        $this->assertSame($originalOrderNumber, $transaction->order_number);
+        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
+        $this->assertNull($transaction->cancelled_at);
         $this->assertSame(2, $menu->fresh()->reserved_stock);
         $this->assertSame(10, $menu->fresh()->stock);
+
+        $this->assertDatabaseCount('transaksi', 1);
+
+        $this->get(route('kiosk.orders.show', $transaction->order_number))
+            ->assertOk()
+            ->assertSee('Menunggu pembayaran')
+            ->assertDontSee('Metode pembayaran diganti')
+            ->assertSee('id="change-payment-form"', false);
 
         $this->get(route('kiosk.checkout.create'))
             ->assertOk()
@@ -391,8 +464,10 @@ class DeviceAndOrderFlowTest extends TestCase
             ->assertSessionHas('success', 'Pesanan berhasil dibatalkan dan stok telah dikembalikan.')
             ->assertSessionMissing('cart');
 
-        $this->assertSame(Transaction::PAYMENT_CANCELLED, $transaction->fresh()->payment_status);
-        $this->assertSame(Transaction::ORDER_CANCELLED, $transaction->fresh()->order_status);
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_CANCELLED, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_CANCELLED, $transaction->order_status);
+        $this->assertNotNull($transaction->cancelled_at);
         $this->assertSame(0, $menu->fresh()->reserved_stock);
         $this->assertDatabaseMissing('cart_reservations', ['menu_id' => $menu->id]);
     }
@@ -421,10 +496,159 @@ class DeviceAndOrderFlowTest extends TestCase
         $this->assertDatabaseMissing('cart_reservations', ['menu_id' => $menu->id]);
     }
 
-    public function test_changing_payment_method_cancels_midtrans_before_restoring_checkout(): void
+    public function test_changing_payment_method_keeps_the_same_guest_session(): void
+    {
+        $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'minuman-session']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Wedang Jahe',
+            'slug' => 'wedang-jahe-session',
+            'price' => 7000,
+            'stock' => 10,
+        ]);
+
+        $this->activateDevice(Device::TYPE_KIOSK)
+            ->post(route('kiosk.cart.store'), ['menu_id' => $menu->id, 'quantity' => 1]);
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Ayu',
+            'payment_method' => 'cash',
+        ]);
+        $first = Transaction::query()->firstOrFail();
+
+        $this->mock(MidtransService::class)
+            ->shouldReceive('createSnapToken')
+            ->once()
+            ->andReturn('replacement-qris-token');
+
+        $this->post(route('kiosk.orders.change-payment', $first->order_number))
+            ->assertRedirect(route('kiosk.checkout.create'));
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Ayu',
+            'payment_method' => 'qris',
+        ])->assertRedirect();
+
+        $second = Transaction::query()->latest('id')->firstOrFail();
+        $this->assertSame($first->id, $second->id);
+        $this->assertSame($first->order_number, $second->order_number);
+        $this->assertSame($first->user_session_id, $second->user_session_id);
+        $this->assertSame(Transaction::PAYMENT_PENDING, $second->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $second->order_status);
+        $this->assertSame('midtrans', $second->payment_method);
+        $this->assertSame('other_qris', $second->payment_channel);
+        $this->assertDatabaseCount('transaksi', 1);
+        $this->assertDatabaseCount('user', 1);
+    }
+
+    public function test_another_guest_on_the_same_kiosk_cannot_mutate_an_order(): void
+    {
+        $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'minuman-ownership']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Kopi Tubruk',
+            'slug' => 'kopi-tubruk-ownership',
+            'price' => 5000,
+            'stock' => 10,
+        ]);
+
+        $this->activateDevice(Device::TYPE_KIOSK)
+            ->post(route('kiosk.cart.store'), ['menu_id' => $menu->id, 'quantity' => 1]);
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Tamu Pertama',
+            'payment_method' => 'cash',
+        ]);
+        $transaction = Transaction::query()->firstOrFail();
+
+        $this->withSession(['guest_session_id' => 'guest-session-other'])
+            ->get(route('kiosk.orders.show', $transaction->order_number))
+            ->assertNotFound();
+        $this->withSession(['guest_session_id' => 'guest-session-other'])
+            ->post(route('kiosk.orders.change-payment', $transaction->order_number))
+            ->assertNotFound();
+        $this->withSession(['guest_session_id' => 'guest-session-other'])
+            ->post(route('kiosk.orders.cancel-order', $transaction->order_number))
+            ->assertNotFound();
+
+        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->fresh()->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->fresh()->order_status);
+    }
+
+    public function test_full_cancellation_rotates_guest_session_for_the_next_customer(): void
+    {
+        $category = Category::query()->create(['name' => 'Camilan', 'slug' => 'camilan-session']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Tahu Crispy',
+            'slug' => 'tahu-crispy-session',
+            'price' => 6000,
+            'stock' => 10,
+        ]);
+
+        $this->activateDevice(Device::TYPE_KIOSK)
+            ->post(route('kiosk.cart.store'), ['menu_id' => $menu->id, 'quantity' => 1]);
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Dewi',
+            'payment_method' => 'cash',
+        ]);
+        $first = Transaction::query()->firstOrFail();
+
+        $this->post(route('kiosk.orders.cancel-order', $first->order_number))
+            ->assertRedirect(route('kiosk.index'));
+        $this->post(route('kiosk.cart.store'), ['menu_id' => $menu->id, 'quantity' => 1]);
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Eka',
+            'payment_method' => 'cash',
+        ])->assertRedirect();
+
+        $second = Transaction::query()->latest('id')->firstOrFail();
+        $this->assertNotSame($first->id, $second->id);
+        $this->assertNotSame($first->order_number, $second->order_number);
+        $this->assertNotSame($first->user_session_id, $second->user_session_id);
+        $this->assertSame('Dewi', $first->customer_name);
+        $this->assertSame('Eka', $second->customer_name);
+        $this->assertDatabaseCount('user', 2);
+    }
+
+    public function test_confirmed_order_rotates_guest_session_when_kiosk_receives_status(): void
+    {
+        $category = Category::query()->create(['name' => 'Makanan', 'slug' => 'makanan-confirmed-session']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Sego Kucing',
+            'slug' => 'sego-kucing-session',
+            'price' => 5000,
+            'stock' => 10,
+        ]);
+
+        $this->activateDevice(Device::TYPE_KIOSK)
+            ->post(route('kiosk.cart.store'), ['menu_id' => $menu->id, 'quantity' => 1]);
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Fajar',
+            'payment_method' => 'cash',
+        ]);
+        $first = Transaction::query()->firstOrFail();
+        app(OrderService::class)->confirmCash($first, Admin::factory()->create());
+
+        $this->withCredentials()
+            ->getJson(route('kiosk.orders.status', $first->order_number))
+            ->assertOk()
+            ->assertJsonPath('confirmed', true);
+        $this->post(route('kiosk.cart.store'), ['menu_id' => $menu->id, 'quantity' => 1]);
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Gita',
+            'payment_method' => 'cash',
+        ])->assertRedirect();
+
+        $second = Transaction::query()->latest('id')->firstOrFail();
+        $this->assertNotSame($first->user_session_id, $second->user_session_id);
+        $this->assertDatabaseCount('user', 2);
+    }
+
+    public function test_changing_qris_payment_replaces_midtrans_before_restoring_checkout(): void
     {
         $this->activateDevice(Device::TYPE_KIOSK);
         $device = Device::query()->latest('id')->firstOrFail();
+        $customer = $this->customer('Siti');
+        $this->withSession(['guest_session_id' => $customer->session_id]);
         $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'minuman']);
         $menu = Menu::query()->create([
             'category_id' => $category->id,
@@ -436,6 +660,7 @@ class DeviceAndOrderFlowTest extends TestCase
         ]);
         $transaction = Transaction::query()->create([
             'order_number' => 'S1-TEST-MIDTRANS-CANCEL',
+            'user_session_id' => $customer->session_id,
             'device_id' => $device->id,
             'customer_name' => 'Siti',
             'subtotal' => 5000,
@@ -463,18 +688,37 @@ class DeviceAndOrderFlowTest extends TestCase
             ->assertSee('Batalkan pesanan')
             ->assertSee('window.snap.pay', false);
 
-        $this->post(route('kiosk.orders.cancel', $transaction->order_number))
+        $this->post(route('kiosk.orders.change-payment', $transaction->order_number))
             ->assertRedirect(route('kiosk.checkout.create'))
-            ->assertSessionHas('cart', [$menu->id => 1]);
+            ->assertSessionMissing('cart');
 
-        $this->assertSame(Transaction::PAYMENT_CANCELLED, $transaction->fresh()->payment_status);
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
+        $this->assertNull($transaction->cancelled_at);
         $this->assertSame(1, $menu->fresh()->reserved_stock);
+
+        $originalId = $transaction->id;
+        $originalOrderNumber = $transaction->order_number;
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Siti',
+            'payment_method' => 'cash',
+        ])->assertRedirect();
+
+        $replacement = Transaction::query()->latest('id')->firstOrFail();
+        $this->assertSame($originalId, $replacement->id);
+        $this->assertSame($originalOrderNumber, $replacement->order_number);
+        $this->assertSame('cash', $replacement->payment_method);
+        $this->assertSame(Transaction::PAYMENT_PENDING, $replacement->payment_status);
+        $this->assertDatabaseCount('transaksi', 1);
     }
 
     public function test_cancelling_digital_order_cancels_midtrans_and_does_not_restore_checkout(): void
     {
         $this->activateDevice(Device::TYPE_KIOSK);
         $device = Device::query()->latest('id')->firstOrFail();
+        $customer = $this->customer('Dina');
+        $this->withSession(['guest_session_id' => $customer->session_id]);
         $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'minuman']);
         $menu = Menu::query()->create([
             'category_id' => $category->id,
@@ -486,6 +730,7 @@ class DeviceAndOrderFlowTest extends TestCase
         ]);
         $transaction = Transaction::query()->create([
             'order_number' => 'S1-TEST-DIGITAL-CANCEL-ORDER',
+            'user_session_id' => $customer->session_id,
             'device_id' => $device->id,
             'customer_name' => 'Dina',
             'subtotal' => 8000,
@@ -511,7 +756,10 @@ class DeviceAndOrderFlowTest extends TestCase
             ->assertRedirect(route('kiosk.index'))
             ->assertSessionMissing('cart');
 
-        $this->assertSame(Transaction::PAYMENT_CANCELLED, $transaction->fresh()->payment_status);
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_CANCELLED, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_CANCELLED, $transaction->order_status);
+        $this->assertNotNull($transaction->cancelled_at);
         $this->assertSame(0, $menu->fresh()->reserved_stock);
         $this->assertDatabaseMissing('cart_reservations', ['menu_id' => $menu->id]);
     }
@@ -602,6 +850,8 @@ class DeviceAndOrderFlowTest extends TestCase
     {
         $this->activateDevice(Device::TYPE_KIOSK);
         $device = Device::query()->latest('id')->firstOrFail();
+        $customer = $this->customer('Budi');
+        $this->withSession(['guest_session_id' => $customer->session_id]);
         $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'minuman']);
         $menu = Menu::query()->create([
             'category_id' => $category->id,
@@ -613,6 +863,7 @@ class DeviceAndOrderFlowTest extends TestCase
         ]);
         $transaction = Transaction::query()->create([
             'order_number' => 'S1-TEST-MIDTRANS-FAIL',
+            'user_session_id' => $customer->session_id,
             'device_id' => $device->id,
             'customer_name' => 'Budi',
             'subtotal' => 5000,
@@ -633,12 +884,278 @@ class DeviceAndOrderFlowTest extends TestCase
             ->andThrow(new \RuntimeException('Midtrans sedang tidak dapat dihubungi.'));
 
         $this->from(route('kiosk.orders.show', $transaction->order_number))
-            ->post(route('kiosk.orders.cancel', $transaction->order_number))
+            ->post(route('kiosk.orders.change-payment', $transaction->order_number))
             ->assertRedirect(route('kiosk.orders.show', $transaction->order_number))
             ->assertSessionHas('error', 'Midtrans sedang tidak dapat dihubungi.');
 
-        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->fresh()->payment_status);
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
         $this->assertSame(1, $menu->fresh()->reserved_stock);
+        $this->assertDatabaseCount('cart_reservations', 0);
+    }
+
+    public function test_changing_virtual_account_payment_can_create_another_virtual_account_order(): void
+    {
+        $this->activateDevice(Device::TYPE_KIOSK);
+        $device = Device::query()->latest('id')->firstOrFail();
+        $customer = $this->customer('Rina VA');
+        $this->withSession(['guest_session_id' => $customer->session_id]);
+        $category = Category::query()->create(['name' => 'Makanan', 'slug' => 'makanan-va-replacement']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Nasi Kucing',
+            'slug' => 'nasi-kucing-va-replacement',
+            'price' => 6000,
+            'stock' => 10,
+            'reserved_stock' => 1,
+        ]);
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-VA-REPLACEMENT',
+            'user_session_id' => $customer->session_id,
+            'device_id' => $device->id,
+            'customer_name' => 'Rina VA',
+            'subtotal' => 6000,
+            'total' => 6000,
+            'payment_method' => 'midtrans',
+            'payment_channel' => 'bca_va',
+            'midtrans_transaction_id' => 'old-va-transaction',
+            'midtrans_payment_type' => 'bank_transfer',
+            'midtrans_bank' => 'bca',
+            'midtrans_va_number' => '111111111111',
+        ]);
+        $transaction->items()->create([
+            'menu_id' => $menu->id,
+            'menu_name' => $menu->name,
+            'price' => 6000,
+            'quantity' => 1,
+            'subtotal' => 6000,
+        ]);
+        $midtrans = $this->mock(MidtransService::class);
+        $midtrans->shouldReceive('cancelTransaction')
+            ->once()
+            ->withArgs(fn (Transaction $order): bool => $order->is($transaction));
+        $midtrans->shouldReceive('createVirtualAccount')
+            ->once()
+            ->andReturn([
+                'transaction_id' => 'replacement-va-transaction',
+                'payment_type' => 'bank_transfer',
+                'bank' => 'bni',
+                'va_number' => '222222222222',
+            ]);
+
+        $this->post(route('kiosk.orders.change-payment', $transaction->order_number))
+            ->assertRedirect(route('kiosk.checkout.create'))
+            ->assertSessionMissing('cart');
+        $this->post(route('kiosk.checkout.store'), [
+            'customer_name' => 'Rina VA',
+            'payment_method' => 'bank_transfer',
+            'payment_channel' => 'bni_va',
+        ])->assertRedirect();
+
+        $replacement = Transaction::query()->latest('id')->firstOrFail();
+        $this->assertSame($transaction->id, $replacement->id);
+        $this->assertSame($transaction->order_number, $replacement->order_number);
+        $this->assertSame(Transaction::PAYMENT_PENDING, $replacement->payment_status);
+        $this->assertSame('bni_va', $replacement->payment_channel);
+        $this->assertSame('222222222222', $replacement->midtrans_va_number);
+        $this->assertDatabaseCount('transaksi', 1);
+        $this->assertSame(1, $menu->fresh()->reserved_stock);
+        $this->assertSame(10, $menu->fresh()->stock);
+    }
+
+    public function test_cancel_webhook_finalizes_replacing_payment_without_cancelling_order(): void
+    {
+        Config::set('services.midtrans.server_key', 'SB-Mid-server-test');
+        $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'cancel-replacing-webhook']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Kopi Tubruk',
+            'slug' => 'kopi-tubruk-cancel-replacing',
+            'price' => 5000,
+            'stock' => 10,
+            'reserved_stock' => 1,
+        ]);
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-CANCEL-REPLACING',
+            'user_session_id' => $this->customer('Cancel Replacing')->session_id,
+            'customer_name' => 'Cancel Replacing',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'midtrans',
+            'payment_status' => Transaction::PAYMENT_REPLACING,
+            'order_status' => Transaction::ORDER_REPLACING,
+        ]);
+        $transaction->items()->create([
+            'menu_id' => $menu->id,
+            'menu_name' => $menu->name,
+            'price' => 5000,
+            'quantity' => 1,
+            'subtotal' => 5000,
+        ]);
+        $payload = $this->midtransPayload($transaction, 'cancel', '200');
+
+        $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+        $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
+        $this->assertNull($transaction->cancelled_at);
+        $this->assertSame('Pending', $transaction->payment_status_label);
+        $this->assertSame(10, $menu->fresh()->stock);
+        $this->assertSame(1, $menu->fresh()->reserved_stock);
+    }
+
+    public function test_cancel_webhook_without_replacement_intent_remains_cancelled(): void
+    {
+        Config::set('services.midtrans.server_key', 'SB-Mid-server-test');
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-CANCEL-NORMAL',
+            'user_session_id' => $this->customer('Cancel Normal')->session_id,
+            'customer_name' => 'Cancel Normal',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'midtrans',
+            'payment_status' => Transaction::PAYMENT_PENDING,
+        ]);
+        $payload = $this->midtransPayload($transaction, 'cancel', '200');
+
+        $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_CANCELLED, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
+        $this->assertNull($transaction->cancelled_at);
+    }
+
+    public function test_deny_and_expire_webhooks_keep_their_payment_statuses(): void
+    {
+        Config::set('services.midtrans.server_key', 'SB-Mid-server-test');
+
+        foreach ([
+            ['deny', Transaction::PAYMENT_FAILED],
+            ['expire', Transaction::PAYMENT_EXPIRED],
+        ] as [$status, $expectedPaymentStatus]) {
+            $transaction = Transaction::query()->create([
+                'order_number' => 'S1-TEST-'.strtoupper($status),
+                'user_session_id' => $this->customer('Webhook '.$status)->session_id,
+                'customer_name' => 'Webhook '.$status,
+                'subtotal' => 5000,
+                'total' => 5000,
+                'payment_method' => 'midtrans',
+                'payment_status' => Transaction::PAYMENT_PENDING,
+            ]);
+
+            $this->postJson(route('midtrans.notification'), $this->midtransPayload($transaction, $status, '200'))
+                ->assertOk();
+
+            $transaction->refresh();
+            $this->assertSame($expectedPaymentStatus, $transaction->payment_status);
+            $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
+            $this->assertNull($transaction->cancelled_at);
+        }
+    }
+
+    public function test_settlement_webhook_wins_replacement_race_and_commits_stock_once(): void
+    {
+        Config::set('services.midtrans.server_key', 'SB-Mid-server-test');
+        $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'settlement-replacing-webhook']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Susu Jahe',
+            'slug' => 'susu-jahe-settlement-replacing',
+            'price' => 7000,
+            'stock' => 10,
+            'reserved_stock' => 2,
+        ]);
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-SETTLEMENT-REPLACING',
+            'user_session_id' => $this->customer('Settlement Replacing')->session_id,
+            'customer_name' => 'Settlement Replacing',
+            'subtotal' => 14000,
+            'total' => 14000,
+            'payment_method' => 'midtrans',
+            'payment_status' => Transaction::PAYMENT_REPLACING,
+            'order_status' => Transaction::ORDER_REPLACING,
+        ]);
+        $transaction->items()->create([
+            'menu_id' => $menu->id,
+            'menu_name' => $menu->name,
+            'price' => 7000,
+            'quantity' => 2,
+            'subtotal' => 14000,
+        ]);
+        $payload = $this->midtransPayload($transaction, 'settlement', '200', [
+            'transaction_id' => 'settlement-wins-race',
+            'payment_type' => 'qris',
+        ]);
+
+        $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+        $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_PAID, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
+        $this->assertSame('settlement-wins-race', $transaction->midtrans_transaction_id);
+        $this->assertSame(8, $menu->fresh()->stock);
+        $this->assertSame(0, $menu->fresh()->reserved_stock);
+    }
+
+    public function test_payment_winning_change_request_does_not_restore_checkout(): void
+    {
+        $this->activateDevice(Device::TYPE_KIOSK);
+        $device = Device::query()->latest('id')->firstOrFail();
+        $customer = $this->customer('Payment Wins');
+        $this->withSession(['guest_session_id' => $customer->session_id]);
+        $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'payment-wins-change-request']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Teh Tarik',
+            'slug' => 'teh-tarik-payment-wins',
+            'price' => 8000,
+            'stock' => 10,
+            'reserved_stock' => 1,
+        ]);
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-PAYMENT-WINS-CHANGE',
+            'user_session_id' => $customer->session_id,
+            'device_id' => $device->id,
+            'customer_name' => 'Payment Wins',
+            'subtotal' => 8000,
+            'total' => 8000,
+            'payment_method' => 'midtrans',
+            'midtrans_snap_token' => 'payment-wins-token',
+        ]);
+        $transaction->items()->create([
+            'menu_id' => $menu->id,
+            'menu_name' => $menu->name,
+            'price' => 8000,
+            'quantity' => 1,
+            'subtotal' => 8000,
+        ]);
+        $this->mock(MidtransService::class)
+            ->shouldReceive('cancelTransaction')
+            ->once()
+            ->andReturnUsing(function (Transaction $order): void {
+                app(OrderService::class)->markPaid($order, [
+                    'transaction_id' => 'payment-wins-change-request',
+                    'payment_type' => 'qris',
+                ]);
+            });
+
+        $this->from(route('kiosk.orders.show', $transaction->order_number))
+            ->post(route('kiosk.orders.change-payment', $transaction->order_number))
+            ->assertRedirect(route('kiosk.orders.show', $transaction->order_number))
+            ->assertSessionHas('error', 'Metode pembayaran tidak dapat diganti karena status pesanan sudah berubah.')
+            ->assertSessionMissing('cart');
+
+        $transaction->refresh();
+        $this->assertSame(Transaction::PAYMENT_PAID, $transaction->payment_status);
+        $this->assertSame(Transaction::ORDER_NEW, $transaction->order_status);
+        $this->assertSame(9, $menu->fresh()->stock);
+        $this->assertSame(0, $menu->fresh()->reserved_stock);
+        $this->assertDatabaseCount('cart_reservations', 0);
     }
 
     public function test_admin_can_cancel_pending_order_and_return_to_transaction_history(): void
@@ -654,6 +1171,7 @@ class DeviceAndOrderFlowTest extends TestCase
         ]);
         $transaction = Transaction::query()->create([
             'order_number' => 'S1-TEST-ADMIN-CANCEL',
+            'user_session_id' => $this->customer('Wart')->session_id,
             'customer_name' => 'Wart',
             'subtotal' => 5000,
             'total' => 5000,
@@ -666,7 +1184,12 @@ class DeviceAndOrderFlowTest extends TestCase
             'quantity' => 1,
             'subtotal' => 5000,
         ]);
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
+
+        $this->mock(MidtransService::class)
+            ->shouldReceive('cancelTransaction')
+            ->once()
+            ->withArgs(fn (Transaction $order): bool => $order->is($transaction));
 
         $this->activateDevice(Device::TYPE_ADMIN)
             ->actingAs($admin)
@@ -678,6 +1201,89 @@ class DeviceAndOrderFlowTest extends TestCase
         $this->assertSame(Transaction::ORDER_CANCELLED, $transaction->fresh()->order_status);
         $this->assertSame(0, $menu->fresh()->reserved_stock);
         $this->assertSame(10, $menu->fresh()->stock);
+    }
+
+    public function test_staff_cancellation_keeps_digital_order_pending_when_midtrans_fails(): void
+    {
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-STAFF-CANCEL-FAIL',
+            'user_session_id' => $this->customer('Staff Cancel')->session_id,
+            'customer_name' => 'Staff Cancel',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'midtrans',
+            'payment_status' => Transaction::PAYMENT_PENDING,
+        ]);
+        $admin = Admin::factory()->create();
+
+        $this->mock(MidtransService::class)
+            ->shouldReceive('cancelTransaction')
+            ->once()
+            ->withArgs(fn (Transaction $order): bool => $order->is($transaction))
+            ->andThrow(new \RuntimeException('Midtrans sedang tidak dapat dihubungi.'));
+
+        $this->activateDevice(Device::TYPE_ADMIN)
+            ->actingAs($admin)
+            ->post(route('admin.orders.cancel', $transaction))
+            ->assertRedirect()
+            ->assertSessionHas('error', 'Midtrans sedang tidak dapat dihubungi.');
+
+        $this->assertSame(Transaction::PAYMENT_PENDING, $transaction->fresh()->payment_status);
+    }
+
+    public function test_admin_can_accept_paid_digital_order_and_is_recorded_as_actor(): void
+    {
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-ACCEPT-ADMIN',
+            'user_session_id' => $this->customer('Accept Admin')->session_id,
+            'customer_name' => 'Accept Admin',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'midtrans',
+            'payment_status' => Transaction::PAYMENT_PAID,
+            'paid_at' => now(),
+        ]);
+        $admin = Admin::factory()->create();
+
+        $this->activateDevice(Device::TYPE_ADMIN)
+            ->actingAs($admin)
+            ->post(route('admin.orders.accept-digital', $transaction))
+            ->assertRedirect(route('admin.orders.receipt', ['transaction' => $transaction, 'auto' => 1]));
+
+        $this->assertDatabaseHas('transaksi', [
+            'id' => $transaction->id,
+            'admin_id' => $admin->id,
+            'kasir_id' => null,
+            'order_status' => Transaction::ORDER_PROCESSING,
+        ]);
+    }
+
+    public function test_kasir_can_accept_paid_digital_order_and_is_recorded_as_actor(): void
+    {
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-ACCEPT-KASIR',
+            'user_session_id' => $this->customer('Accept Kasir')->session_id,
+            'customer_name' => 'Accept Kasir',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'midtrans',
+            'payment_status' => Transaction::PAYMENT_PAID,
+            'paid_at' => now(),
+        ]);
+        $kasir = Kasir::factory()->create();
+
+        $this->activateDevice(Device::TYPE_ADMIN)
+            ->actingAs($kasir, 'kasir')
+            ->withSession(['staff_guard' => 'kasir'])
+            ->post(route('admin.orders.accept-digital', $transaction))
+            ->assertRedirect(route('admin.orders.receipt', ['transaction' => $transaction, 'auto' => 1]));
+
+        $this->assertDatabaseHas('transaksi', [
+            'id' => $transaction->id,
+            'admin_id' => null,
+            'kasir_id' => $kasir->id,
+            'order_status' => Transaction::ORDER_PROCESSING,
+        ]);
     }
 
     public function test_valid_midtrans_webhook_is_idempotent(): void
@@ -694,6 +1300,7 @@ class DeviceAndOrderFlowTest extends TestCase
         ]);
         $transaction = Transaction::query()->create([
             'order_number' => 'S1-TEST-WEBHOOK',
+            'user_session_id' => $this->customer('Siti')->session_id,
             'customer_name' => 'Siti',
             'subtotal' => 10000,
             'total' => 10000,
@@ -722,5 +1329,119 @@ class DeviceAndOrderFlowTest extends TestCase
         $this->assertSame(8, $menu->fresh()->stock);
         $this->assertSame(0, $menu->fresh()->reserved_stock);
         $this->assertSame(Transaction::PAYMENT_PAID, $transaction->fresh()->payment_status);
+    }
+
+    public function test_expire_webhook_does_not_reverse_a_paid_transaction(): void
+    {
+        Config::set('services.midtrans.server_key', 'SB-Mid-server-test');
+        $category = Category::query()->create(['name' => 'Minuman', 'slug' => 'minuman-webhook-conflict']);
+        $menu = Menu::query()->create([
+            'category_id' => $category->id,
+            'name' => 'Teh Hangat',
+            'slug' => 'teh-hangat-webhook-conflict',
+            'price' => 5000,
+            'stock' => 9,
+            'reserved_stock' => 0,
+        ]);
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-WEBHOOK-CONFLICT',
+            'user_session_id' => $this->customer('Webhook Conflict')->session_id,
+            'customer_name' => 'Webhook Conflict',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'midtrans',
+            'payment_status' => Transaction::PAYMENT_PAID,
+            'paid_at' => now(),
+        ]);
+        $transaction->items()->create([
+            'menu_id' => $menu->id,
+            'menu_name' => $menu->name,
+            'price' => 5000,
+            'quantity' => 1,
+            'subtotal' => 5000,
+        ]);
+        $payload = [
+            'order_id' => $transaction->order_number,
+            'status_code' => '407',
+            'gross_amount' => '5000.00',
+            'transaction_status' => 'expire',
+        ];
+        $payload['signature_key'] = hash('sha512', $payload['order_id'].$payload['status_code'].$payload['gross_amount'].'SB-Mid-server-test');
+
+        $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+
+        $this->assertSame(Transaction::PAYMENT_PAID, $transaction->fresh()->payment_status);
+        $this->assertSame(9, $menu->fresh()->stock);
+        $this->assertSame(0, $menu->fresh()->reserved_stock);
+    }
+
+    public function test_admin_filter_and_detail_label_replaced_payment_without_cancellation(): void
+    {
+        $transaction = Transaction::query()->create([
+            'order_number' => 'S1-TEST-ADMIN-REPLACED',
+            'user_session_id' => $this->customer('Admin Replaced')->session_id,
+            'customer_name' => 'Admin Replaced',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'cash',
+            'payment_status' => Transaction::PAYMENT_REPLACED,
+            'order_status' => Transaction::ORDER_REPLACED,
+        ]);
+        Transaction::query()->create([
+            'order_number' => 'S1-TEST-ADMIN-CANCELLED-FILTER',
+            'user_session_id' => $this->customer('Admin Cancelled')->session_id,
+            'customer_name' => 'Admin Cancelled',
+            'subtotal' => 5000,
+            'total' => 5000,
+            'payment_method' => 'cash',
+            'payment_status' => Transaction::PAYMENT_CANCELLED,
+            'order_status' => Transaction::ORDER_CANCELLED,
+            'cancelled_at' => now(),
+        ]);
+        $admin = Admin::factory()->create();
+        $this->activateDevice(Device::TYPE_ADMIN)->actingAs($admin);
+
+        $this->get(route('admin.orders.index', ['status' => Transaction::PAYMENT_REPLACED]))
+            ->assertOk()
+            ->assertSee('Metode Diganti')
+            ->assertSee('S1-TEST-ADMIN-REPLACED')
+            ->assertSee('Metode pembayaran diganti')
+            ->assertDontSee('S1-TEST-ADMIN-CANCELLED-FILTER');
+
+        $this->get(route('admin.orders.show', $transaction))
+            ->assertOk()
+            ->assertSee('Metode pembayaran diganti')
+            ->assertDontSee('Dibatalkan');
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('S1-TEST-ADMIN-REPLACED')
+            ->assertSee('Metode pembayaran diganti');
+    }
+
+    private function customer(string $name): Customer
+    {
+        return Customer::query()->firstOrCreate([
+            'session_id' => 'test-customer-'.Str::slug($name),
+        ], [
+            'name' => $name,
+        ]);
+    }
+
+    private function midtransPayload(Transaction $transaction, string $status, string $statusCode, array $extra = []): array
+    {
+        $payload = [
+            'order_id' => $transaction->order_number,
+            'status_code' => $statusCode,
+            'gross_amount' => number_format($transaction->total, 2, '.', ''),
+            'transaction_status' => $status,
+            ...$extra,
+        ];
+        $payload['signature_key'] = hash(
+            'sha512',
+            $payload['order_id'].$payload['status_code'].$payload['gross_amount'].'SB-Mid-server-test'
+        );
+
+        return $payload;
     }
 }

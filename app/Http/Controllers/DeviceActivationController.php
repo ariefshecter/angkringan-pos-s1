@@ -26,6 +26,7 @@ class DeviceActivationController extends Controller
         $activation = DB::transaction(function () use ($activationCodes, $request, $validated): ?array {
             $device = Device::query()
                 ->where('activation_code_hash', $activationCodes->hash($validated['activation_code']))
+                ->where('type', Device::TYPE_KIOSK)
                 ->where('is_active', true)
                 ->lockForUpdate()
                 ->first();
@@ -55,7 +56,7 @@ class DeviceActivationController extends Controller
         $device = $activation['device'];
         $token = $activation['token'];
 
-        $destination = $device->type === Device::TYPE_KIOSK ? route('kiosk.index') : route('login');
+        $destination = route('kiosk.index');
 
         return redirect($destination)->withCookie(cookie(
             'device_token',

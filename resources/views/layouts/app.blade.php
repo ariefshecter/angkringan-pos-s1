@@ -26,7 +26,7 @@
                     <div class="grid h-9 w-9 place-items-center rounded-full border border-stone-500 text-stone-700">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.1a7.5 7.5 0 0 1 15 0 17.9 17.9 0 0 1-15 0Z"/></svg>
                     </div>
-                    <div class="hidden sm:block"><p class="text-xs font-semibold text-stone-900">{{ auth()->user()->name }}</p><p class="text-[10px] capitalize text-stone-500">Role: {{ auth()->user()->role }}</p></div>
+                    <div class="hidden sm:block"><p class="text-xs font-semibold text-stone-900">{{ auth()->user()->name }}</p><p class="text-[10px] capitalize text-stone-500">Role: {{ session('staff_guard') }}</p></div>
                 </div>
             </header>
 
@@ -49,9 +49,13 @@
                 async function checkOrders() {
                     try {
                         const response = await fetch(orderFeedUrl, {headers: {'Accept': 'application/json'}}); if (!response.ok) return;
-                        const data = await response.json(); const newOrders = [];
+                        const data = await response.json(); const newOrders = []; const uniqueOrders = new Map();
                         data.orders.forEach(order => {
-                            const key = `${order.id}:${order.payment_status}`;
+                            if (uniqueOrders.has(order.order_number)) return;
+                            uniqueOrders.set(order.order_number, order);
+                        });
+                        uniqueOrders.forEach(order => {
+                            const key = `${order.order_number}:${order.payment_status}`;
                             if (!knownOrders[key]) { knownOrders[key] = true; newOrders.push(order); }
                         });
                         sessionStorage.setItem('knownOrders', JSON.stringify(knownOrders));

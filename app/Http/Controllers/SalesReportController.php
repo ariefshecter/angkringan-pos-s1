@@ -2,86 +2,137 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaction;
+use App\Models\Admin;
+use App\Models\Report;
+use App\Services\SalesReportService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class SalesReportController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function index(Request $request, SalesReportService $reports): View
     {
-        $period = $request->string('period')->value() === 'monthly' ? 'monthly' : 'weekly';
-        $points = $this->periodPoints($period);
-        $start = $points->first()['date']->copy()->startOfDay();
-        $end = $period === 'monthly'
-            ? $points->last()['date']->copy()->endOfMonth()
-            : $points->last()['date']->copy()->endOfDay();
+        $filters = $this->validatedFilters($request);
 
-        $transactions = Transaction::query()
-            ->where('payment_status', Transaction::PAYMENT_PAID)
-            ->whereNotNull('paid_at')
-            ->whereBetween('paid_at', [$start, $end])
-            ->orderBy('paid_at')
-            ->get();
-        $groupedTransactions = $transactions->groupBy(
-            fn (Transaction $transaction): string => $period === 'monthly'
-                ? $transaction->paid_at->format('Y-m')
-                : $transaction->paid_at->toDateString()
+        return view('admin.reports.sales', $reports->calculate(
+            $filters['mode'],
+            $filters['date'] ?? null,
+            $filters['month'] ?? null,
+        ));
+    }
+
+    public function store(Request $request, SalesReportService $reports): RedirectResponse
+    {
+        $filters = $this->validatedFilters($request);
+        $report = $reports->calculate(
+            $filters['mode'],
+            $filters['date'] ?? null,
+            $filters['month'] ?? null,
         );
-        $chartRows = $points->map(function (array $point) use ($groupedTransactions): array {
-            $transactions = $groupedTransactions->get($point['key'], collect());
+        /** @var Admin $admin */
+        $admin = $request->user();
 
-            return [
-                'label' => $point['label'],
-                'revenue' => (int) $transactions->sum('total'),
-                'orders' => $transactions->count(),
+        DB::transaction(function () use ($report, $admin): void {
+            $snapshot = Report::query()
+                ->whereDate('period_start', $report['start']->toDateString())
+                ->whereDate('period_end', $report['end']->toDateString())
+                ->lockForUpdate()
+                ->first();
+
+            $attributes = [
+                'period_start' => $report['start']->toDateString(),
+                'period_end' => $report['end']->toDateString(),
+                'total_revenue' => $report['summary']['revenue'],
+                'transaction_count' => $report['summary']['transactions'],
+                'admin_id' => $admin->id,
             ];
-        });
-        $totalRevenue = (int) $transactions->sum('total');
-        $transactionCount = $transactions->count();
 
-        return view('admin.reports.sales', [
-            'period' => $period,
-            'periodLabel' => $period === 'monthly' ? '12 Bulan Terakhir' : '7 Hari Terakhir',
-            'rangeLabel' => $start->locale('id')->translatedFormat('d M Y').' – '.$end->locale('id')->translatedFormat('d M Y'),
-            'chartRows' => $chartRows,
-            'summary' => [
-                'revenue' => $totalRevenue,
-                'transactions' => $transactionCount,
-                'average' => $transactionCount > 0 ? (int) round($totalRevenue / $transactionCount) : 0,
-                'cash' => $transactions->where('payment_method', 'cash')->count(),
-                'digital' => $transactions->where('payment_method', 'midtrans')->count(),
-            ],
+            if ($snapshot) {
+                $snapshot->update($attributes);
+            } else {
+                Report::query()->create($attributes);
+            }
+        });
+
+        return redirect()
+            ->route('admin.reports.sales', $filters)
+            ->with('success', 'Rekap laporan berhasil disimpan.');
+    }
+
+    public function snapshots(): View
+    {
+        return view('admin.reports.snapshots', [
+            'reports' => Report::query()->with('admin')->latest('period_end')->latest('id')->paginate(15),
         ]);
     }
 
-    private function periodPoints(string $period): Collection
+    public function show(Report $report): View
     {
-        if ($period === 'monthly') {
-            $start = now()->startOfMonth()->subMonths(11);
+        return view('admin.reports.show', [
+            'report' => $report->load('admin'),
+        ]);
+    }
 
-            return collect(range(0, 11))->map(function (int $offset) use ($start): array {
-                $date = $start->copy()->addMonths($offset);
+    public function pdf(Request $request, SalesReportService $reports): Response
+    {
+        $filters = $this->validatedFilters($request);
+        $report = $reports->calculate(
+            $filters['mode'],
+            $filters['date'] ?? null,
+            $filters['month'] ?? null,
+        );
+        $filename = 'laporan-'.$report['mode'].'-'.$report['start']->format('Y-m-d').'.pdf';
 
-                return [
-                    'key' => $date->format('Y-m'),
-                    'label' => $date->locale('id')->translatedFormat('M Y'),
-                    'date' => $date,
-                ];
-            });
-        }
+        return Pdf::loadView('pdf.sales-report', [
+            ...$report,
+            'isSnapshot' => false,
+            'recordedBy' => null,
+        ])->setPaper('a4')->download($filename);
+    }
 
-        $start = now()->startOfDay()->subDays(6);
+    public function snapshotPdf(Report $report): Response
+    {
+        $report->load('admin');
+        $transactionCount = $report->transaction_count;
 
-        return collect(range(0, 6))->map(function (int $offset) use ($start): array {
-            $date = $start->copy()->addDays($offset);
+        return Pdf::loadView('pdf.sales-report', [
+            'periodLabel' => 'Snapshot Laporan',
+            'rangeLabel' => $report->period_start->format('d/m/Y').' - '.$report->period_end->format('d/m/Y'),
+            'start' => $report->period_start,
+            'end' => $report->period_end,
+            'summary' => [
+                'revenue' => $report->total_revenue,
+                'transactions' => $transactionCount,
+                'average' => $transactionCount > 0 ? (int) round($report->total_revenue / $transactionCount) : 0,
+                'cash' => null,
+                'digital' => null,
+            ],
+            'chartRows' => collect(),
+            'isSnapshot' => true,
+            'recordedBy' => $report->admin?->name,
+        ])->setPaper('a4')->download("laporan-snapshot-{$report->id}.pdf");
+    }
 
-            return [
-                'key' => $date->toDateString(),
-                'label' => $date->locale('id')->translatedFormat('D, d M'),
-                'date' => $date,
-            ];
-        });
+    /** @return array{mode: string, date?: string, month?: string} */
+    private function validatedFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'mode' => ['nullable', Rule::in(['daily', 'monthly'])],
+            'date' => ['nullable', 'required_if:mode,daily', 'date_format:Y-m-d'],
+            'month' => ['nullable', 'required_if:mode,monthly', 'date_format:Y-m'],
+        ]);
+        $mode = $validated['mode'] ?? 'daily';
+
+        return [
+            'mode' => $mode,
+            ...($mode === 'monthly'
+                ? ['month' => $validated['month'] ?? now()->format('Y-m')]
+                : ['date' => $validated['date'] ?? now()->toDateString()]),
+        ];
     }
 }

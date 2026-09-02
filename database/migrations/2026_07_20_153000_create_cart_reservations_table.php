@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('cart_reservations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('device_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('menu_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('menu_id')->constrained('menu')->cascadeOnDelete();
             $table->unsignedInteger('quantity');
             $table->timestamp('expires_at')->index();
             $table->timestamps();

@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
+use App\Models\Admin;
+use App\Models\Kasir;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -16,15 +17,25 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $table = $this->user()->getTable();
+        $otherTable = $this->user() instanceof Admin ? (new Kasir)->getTable() : (new Admin)->getTable();
+
         return [
             'name' => ['required', 'string', 'max:255'],
+            'username' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique($table, 'username')->ignore($this->user()->id),
+                Rule::unique($otherTable, 'username'),
+            ],
             'email' => [
                 'required',
                 'string',
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
+                Rule::unique($table, 'email')->ignore($this->user()->id),
             ],
         ];
     }

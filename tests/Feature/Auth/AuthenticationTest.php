@@ -2,65 +2,114 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
+use App\Models\Admin;
+use App\Models\Kasir;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_screen_can_be_rendered(): void
+    public function test_login_screen_uses_username_for_both_staff_types(): void
     {
-        $response = $this->activateDevice()->get('/login');
-
-        $response->assertStatus(200);
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('Login Admin dan Kasir tanpa aktivasi perangkat')
+            ->assertSee('name="username"', false)
+            ->assertDontSee('name="email"', false);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function test_admin_can_authenticate_from_the_shared_login_screen(): void
     {
-        $user = User::factory()->create();
+        $admin = Admin::factory()->create(['username' => 'administrator']);
 
-        $response = $this->activateDevice()->post('/login', [
-            'email' => $user->email,
+        $response = $this->post(route('login'), [
+            'username' => $admin->username,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticatedAs($admin, 'admin');
+        $this->assertGuest('kasir');
+        $response->assertSessionHas('staff_guard', 'admin')
+            ->assertRedirect(route('dashboard', absolute: false));
+        $this->get(route('dashboard'))->assertOk();
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    public function test_kasir_can_authenticate_from_the_shared_login_screen(): void
     {
-        $user = User::factory()->create();
+        $kasir = Kasir::factory()->create(['username' => 'kasir-satu']);
 
-        $this->activateDevice()->post('/login', [
-            'email' => $user->email,
+        $response = $this->post(route('login'), [
+            'username' => $kasir->username,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($kasir, 'kasir');
+        $this->assertGuest('admin');
+        $response->assertSessionHas('staff_guard', 'kasir')
+            ->assertRedirect(route('dashboard', absolute: false));
+        $this->get(route('dashboard'))->assertOk();
+    }
+
+    public function test_staff_can_not_authenticate_with_invalid_password(): void
+    {
+        $admin = Admin::factory()->create();
+
+        $this->post(route('login'), [
+            'username' => $admin->username,
             'password' => 'wrong-password',
-        ]);
+        ])->assertSessionHasErrors('username');
 
-        $this->assertGuest();
+        $this->assertGuest('admin');
+        $this->assertGuest('kasir');
     }
 
-    public function test_inactive_users_can_not_authenticate(): void
+    public function test_inactive_staff_can_not_authenticate(): void
     {
-        $user = User::factory()->create(['is_active' => false]);
+        $kasir = Kasir::factory()->create(['is_active' => false]);
 
-        $this->activateDevice()->post('/login', [
-            'email' => $user->email,
+        $this->post(route('login'), [
+            'username' => $kasir->username,
             'password' => 'password',
-        ]);
+        ])->assertSessionHasErrors('username');
 
-        $this->assertGuest();
+        $this->assertGuest('admin');
+        $this->assertGuest('kasir');
     }
 
-    public function test_users_can_logout(): void
+    public function test_staff_can_logout_and_both_guards_are_cleared(): void
     {
-        $user = User::factory()->create();
+        $kasir = Kasir::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        $response = $this
+            ->actingAs($kasir, 'kasir')
+            ->withSession(['staff_guard' => 'kasir'])
+            ->post(route('logout'));
 
-        $this->assertGuest();
-        $response->assertRedirect('/');
+        $this->assertGuest('admin');
+        $this->assertGuest('kasir');
+        $response->assertSessionMissing('staff_guard')->assertRedirect('/');
+    }
+
+    public function test_login_is_rate_limited_by_username_and_ip(): void
+    {
+        RateLimiter::clear('rate-limited|127.0.0.1');
+        Admin::factory()->create(['username' => 'rate-limited']);
+        $request = $this;
+
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $request->post(route('login'), [
+                'username' => 'rate-limited',
+                'password' => 'wrong-password',
+            ]);
+        }
+
+        $request->post(route('login'), [
+            'username' => 'rate-limited',
+            'password' => 'wrong-password',
+        ])->assertSessionHasErrors('username');
+        $this->assertTrue(RateLimiter::tooManyAttempts('rate-limited|127.0.0.1', 5));
     }
 }

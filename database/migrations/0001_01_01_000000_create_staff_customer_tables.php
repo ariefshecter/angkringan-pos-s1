@@ -11,13 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('admin', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('username', 50)->unique();
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('is_active')->default(true)->index();
             $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('kasir', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('username', 50)->unique();
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->boolean('is_active')->default(true)->index();
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('user', function (Blueprint $table) {
+            $table->string('session_id')->primary();
+            $table->string('name', 100);
             $table->timestamps();
         });
 
@@ -42,8 +60,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('user');
+        Schema::dropIfExists('kasir');
+        Schema::dropIfExists('admin');
     }
 };

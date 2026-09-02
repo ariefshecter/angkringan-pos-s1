@@ -1,0 +1,805 @@
+PENERAPAN SISTEM INFORMASI KASIR BERBASIS WEB MENGGUNAKAN PAYMENT GATEWAY GUNA MENINGKATKAN EFISIENSI TRANSAKSI DI ANGKRINGAN S1
+
+
+ PROPOSAL SKRIPSI
+
+ 
+
+
+
+Disusun Oleh:
+
+Muhammad Amirul Mustofa
+2255202033
+
+
+
+
+PROGRAM STUDI TEKNIK INFORMATIKA
+FAKULTAS SAINS DAN TEKNOLOGI
+UNIVERSITAS NAHDLATUL ULAMA LAMPUNG
+2026
+PERNYATAAN ORISINALITAS
+
+Nama Lengkap		: Muhammad Amirul Mustofa
+Nim				: 2255202033
+Program Studi			: Teknik Informatika
+Saya yang bertanda tangan di bawah ini, menyatakan bahwa proposal yang saya ajukan ini adalah hasil karya saya sendiri, tidak terdapat karya yang pernah diajukan untuk memperoleh gelar kesarjanaan di suatu perguruan tinggi atau karya yang pernah ditulis atau diterbitkan orang lain kecuali yang secara tertulis diacu dalam naskah ini dan disebutkan dalam daftar pustaka. Karya ini adalah milik saya dan pertanggungjawaban sepenuhnya berada di pundak saya.
+
+
+
+
+Lampung Timur, …………….2026
+
+
+
+Muhammad Amirul Mustofa
+NIM. 2255202033
+
+
+
+
+
+
+ 
+HALAMAN PERSETUJUAN
+
+Judul Proposal	:	Penerapan Sistem Informasi Kasir Berbasis Web Menggunakan Payment Gateway Guna Meningkatkan Efisiensi Transaksi Di Angkringan S1
+Nama Mahasiswa	:	Muhammad Amirul Mustofa
+Nim	:	2255202033
+Program Studi	:	S1 Teknik Informatika
+
+Telah diperiksa dan disetujui untuk diajukan dalam ujian sidang proposal skripsi guna memperoleh gelar Sarjana Komputer (S.Kom) pada program studi Teknik Informatika Universitas Nahdlatul Ulama Lampung.
+
+						Lampung Timur, ………………2026
+
+Disetujui Oleh
+Pembimbing I	Pembimbing II
+Rudi Hartono, S.Kom., M.T.I.
+NIK 021026182	Nuari Anisa Sivi, S.Kom., M.T.I.
+NIK 021036031
+Mengetahui
+Dekan Fakultas Sains dan Teknologi
+	
+Imam Mualim, S.Kom., M.T.I.
+                                      NIK 021026032
+HALAMAN PERSEMBAHAN
+
+ 
+Sembah sujud serta syukur kepada Allah Swt. atas segala rahmat, karunia, serta kemudahan yang telah diberikan, sehingga proposal skripsi ini dapat terselesaikan. Shalawat serta salam senantiasa tercurah kepada junjungan Nabi Besar Muhammad SAW., yang telah membawa umat manusia dari zaman kegelapan menuju zaman yang penuh ilmu pengetahuan.
+Dengan penuh rasa syukur dan hormat, proposal skripsi ini saya persembahkan kepada:
+1.	Kedua orang tua tercinta, Bapak M.A.R. Yani dan Ibu Nur Azizah, yang selalu memberikan kasih sayang, doa, dukungan, nasihat, dan pengorbanan yang luar biasa dalam setiap langkah kehidupan penulis. Terima kasih atas segala perjuangan, cinta, dan ketulusan yang tiada henti. Semoga Allah Swt. senantiasa memberikan kesehatan, kebahagiaan, dan keberkahan kepada Bapak dan Ibu. 
+2.	Dosen Pembimbing I, Bapak Rudi Hartono, S.Kom., M.T.I., yang telah memberikan arahan, bimbingan, masukan, serta ilmu yang sangat bermanfaat kepada penulis selama proses penyusunan proposal skripsi ini. 
+3.	Dosen Pembimbing II, Ibu Nuari Anisa Sivi, S.Kom., M.T.I., yang telah memberikan bimbingan, saran, perhatian, serta dukungan kepada penulis sehingga proposal skripsi ini dapat tersusun dengan baik. 
+4.	Seluruh dosen dan staf Program Studi Teknik Informatika, yang telah memberikan ilmu, pengalaman, serta bimbingan selama masa perkuliahan. 
+5.	Keluarga besar, yang selalu memberikan doa, dukungan, dan motivasi kepada penulis dalam menyelesaikan proposal skripsi ini. 
+6.	Sahabat dan teman-teman seperjuangan Program Studi Teknik Informatika Angkatan 2022, yang selalu memberikan semangat, bantuan, dan kebersamaan selama proses perkuliahan hingga penyusunan proposal skripsi ini. 
+7.	Semua pihak yang tidak dapat disebutkan satu per satu, yang telah membantu, mendukung, dan mendoakan penulis dalam penyusunan proposal skripsi ini. 
+8.	Diri penulis sendiri, Muhammad Amirul Mustofa, yang telah berjuang dengan penuh kesabaran, ketekunan, dan semangat dalam menghadapi berbagai tantangan sejak awal perkuliahan hingga sampai pada tahap penyusunan proposal skripsi ini. Terima kasih atas usaha yang tidak pernah berhenti, doa yang terus dipanjatkan, serta keyakinan untuk tetap melangkah hingga mampu mencapai tahap ini. Semoga seluruh proses yang telah dilalui menjadi pengalaman berharga dan pembelajaran untuk menjadi pribadi yang lebih baik di masa yang akan datang.
+
+
+
+
+
+
+
+
+
+
+
+
+MOTTO
+
+مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا، سَهَّلَ اللهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ
+"Barangsiapa menempuh suatu jalan untuk menuntut ilmu, maka Allah akan mudahkan baginya jalan menuju surga.
+" (H.R. Muslim)
+ 
+KATA PENGANTAR
+
+Puji syukur kehadirat Allah SWT. yang telah melimpahkan rahmat, taufik, dan hidayah-Nya, sehingga penulis dapat menyelesaikan proposal skripsi yang berjudul “Penerapan Sistem Informasi Kasir Berbasis Web Menggunakan Payment Gateway Guna Meningkatkan Efisiensi Transaksi di Angkringan S1” dengan baik. Shalawat serta salam semoga senantiasa tercurah kepada junjungan Nabi Besar Muhammad SAW. beserta keluarga, sahabat, dan seluruh pengikutnya hingga akhir zaman. 
+Proposal skripsi ini disusun sebagai salah satu syarat untuk menempuh tugas akhir pada Program Studi Teknik Informatika, Fakultas Sains dan Teknologi, Universitas Nahdlatul Ulama Lampung. Dalam proses penyusunan proposal skripsi ini, penulis menyadari bahwa tidak sedikit hambatan dan kesulitan yang dihadapi. Namun, berkat doa, dukungan, bimbingan, serta bantuan dari berbagai pihak, proposal skripsi ini dapat diselesaikan.
+Oleh karena itu, pada kesempatan ini penulis mengucapkan terima kasih yang sebesar-besarnya kepada:
+1.	Allah SWT. atas segala rahmat, nikmat, kesehatan, dan kemudahan yang telah diberikan kepada penulis. 
+2.	Kedua orang tua tercinta, Bapak M.A.R. Yani dan Ibu Nur Azizah, yang selalu memberikan doa, kasih sayang, dukungan, nasihat, dan semangat kepada penulis. 
+3.	Bapak Imam Mualim, S.Kom., M.T.I. selaku Dekan Fakultas Sains dan Teknologi Universitas Nahdlatul Ulama Lampung. 
+4.	Bapak Rudi Hartono, S.Kom., M.T.I. selaku Dosen Pembimbing I yang telah memberikan arahan, masukan, serta bimbingan dalam penyusunan proposal skripsi ini. 
+5.	Ibu Nuari Anisa Sivi, S.Kom., M.T.I. selaku Dosen Pembimbing II yang telah memberikan bimbingan, saran, dan dukungan kepada penulis dalam menyelesaikan proposal skripsi ini. 
+6.	Seluruh dosen dan staf Program Studi Teknik Informatika yang telah memberikan ilmu, pengalaman, dan bantuan selama masa perkuliahan. 
+7.	Keluarga, sahabat, dan teman-teman seperjuangan yang selalu memberikan semangat, doa, dan motivasi kepada penulis. 
+8.	Semua pihak yang tidak dapat disebutkan satu per satu yang telah membantu dalam proses penyusunan proposal skripsi ini. 
+Penulis menyadari bahwa proposal skripsi ini masih jauh dari sempurna. Oleh karena itu, penulis sangat mengharapkan kritik dan saran yang membangun demi perbaikan dan penyempurnaan proposal skripsi ini. Penulis berharap semoga proposal skripsi ini dapat memberikan manfaat bagi penulis sendiri, bagi pembaca, serta bagi pengembangan ilmu pengetahuan, khususnya di bidang data mining dan analisis perilaku pemain game.
+
+
+Lampung Timur, …………….2026
+Penulis
+
+
+
+Muhammad Amirul Mustofa
+NIM. 2255202033
+
+
+
+
+
+
+
+DAFTAR ISI
+
+HALAMAN JUDUL	i
+PERNYATAAN ORISINALITAS	ii
+HALAMAN PERSETUJUAN	iii
+HALAMAN PERSEMBAHAN	iv
+MOTTO	vi
+KATA PENGANTAR	vii
+DAFTAR ISI	ix
+DAFTAR TABEL	xi
+DAFTAR GAMBAR	xiii
+BAB I PENDAHULUAN	1
+1.1 Latar Belakang	1
+1.2 Rumusan Masalah	2
+1.3 Batasan Masalah	3
+1.4 Tujuan Penelitian	3
+1.5 Manfaat Penelitian	3
+1.6 Sistematika Penulisan	4
+BAB II TINJAUAN PUSTAKA	6
+2.1 Landasan Teori	6
+2.1.1 Sistem	6
+2.1.2 Sistem Informasi	6
+2.1.3 Kasir	7
+2.1.4 Efisiensi Transaksi	8
+2.1.5 Payment Gateway	9
+2.1.6 Teknologi Pengembangan Sistem	10
+2.1.7 Unified Modeling Language (UML)	13
+2.1.8 Pengujian Sistem	20
+2.1.9 Metode Pengembangan Sistem(waterfall)	21
+2.2 Penelitian Terdahulu	22
+BAB III METODOLOGI PENELITIAN	27
+3.1 Waktu dan Tempat Penelitian	27
+3.1.1 Waktu Penelitian	27
+3.1.2 Tempat Penelitian	27
+3.2 Alat dan Bahan Penelitian	28
+3.2.1 Perangkat Keras (Hardware)	28
+3.2.2 Perangkat Lunak (Software)	28
+3.3 Metode Pengumpulan Data	29
+3.3.1 Observasi	29
+3.3.2 Wawancara	29
+3.3.3 Studi Pustaka	29
+3.4 Metode Penelitian	29
+3.5 Metode Pengembangan Sistem	30
+3.5.1 Metode Waterfall	30
+3.5.2 Analisis Kebutuhan Sistem	32
+3.5.3 Perancangan Sistem dan Basis Data	33
+3.5.4 Implementasi Sistem	50
+3.5.5 Pengujian Sistem	53
+3.6 Jadwal Penelitian	56
+DAFTAR PUSTAKA	58
+
+DAFTAR TABEL
+Tabel 2. 1 Symbol Use Case Diagram.	14
+Tabel 2. 2 Symbol Activity Diagram.	16
+Tabel 2. 3 Simbol Sequence Diagram.	18
+Tabel 2. 4 Symbol Class Diagram.	19
+Tabel 2. 5 Perbedaan Penelitian Relevan.	24
+Tabel 3. 1 Perangkat Keras (Hardware).	28
+Tabel 3. 2 Perangkat Lunak (Software).	28
+Tabel 3. 3 Admin.	42
+Tabel 3. 4 Kasir.	42
+Tabel 3. 5 User (Pelanggan).	42
+Tabel 3. 6 Kategori.	43
+Tabel 3. 7 Menu.	43
+Tabel 3. 8 Transaksi.	44
+Tabel 3. 9 Detail Transaksi.	44
+Tabel 3. 10 Laporan.	45
+Tabel 3. 11 Pengujian Sistem (Black Box Testing).	54
+Tabel 3. 12 Jadwal Penelitian.	57
+
+
+
+
+
+
+
+ 
+DAFTAR GAMBAR
+
+Gambar 3. 1 Peta Angkringan S1.	27
+Gambar 3. 2 waterfall.	31
+Gambar 3. 3 Use Case Diagram.	34
+Gambar 3. 4 Activity Diagram.	36
+Gambar 3. 5 Sequence Diagram.	37
+Gambar 3. 6 Class Diagram.	40
+Gambar 3. 7 Halaman Login.	46
+Gambar 3. 8 Halaman Dashboard Admin.	46
+Gambar 3. 9 Halaman Daftar Menu User.	47
+Gambar 3. 10 Halaman Checkout Transaksi.	48
+Gambar 3. 11 Halaman Pembayaran Digital.	49
+Gambar 3. 12 Halaman Status Transaksi.	49
+Gambar 3. 13 Halaman Riwayat Transaksi.	50
+ 
+BAB I
+PENDAHULUAN
+
+1.1 Latar Belakang
+Angkringan S1 merupakan salah satu Usaha Mikro, Kecil, dan Menengah (UMKM) yang bergerak di bidang kuliner dengan aktivitas utama melayani penjualan makanan dan minuman secara langsung kepada pelanggan. Dalam menjalankan kegiatan operasionalnya, proses transaksi di Angkringan S1 masih dilakukan secara konvensional, yaitu pelanggan memesan kepada kasir, kemudian kasir mencatat pesanan secara manual, menghitung total pembayaran menggunakan kalkulator, dan hanya menerima pembayaran secara tunai (cash). Kondisi tersebut menimbulkan beberapa permasalahan, di antaranya proses transaksi yang memerlukan waktu lebih lama, potensi terjadinya human error dalam pencatatan maupun perhitungan transaksi, kesulitan dalam menyusun laporan penjualan secara cepat dan akurat, serta pencatatan stok menu yang masih dilakukan secara manual sehingga berpotensi menyebabkan ketidaksesuaian antara stok yang tersedia dengan kondisi sebenarnya. Permasalahan tersebut mengakibatkan proses pelayanan menjadi kurang efisien dan menyulitkan pengelolaan operasional usaha.
+Di sisi lain, perkembangan teknologi telah mengubah kebiasaan masyarakat dalam melakukan transaksi. Saat ini sebagian besar konsumen lebih memilih metode pembayaran non-tunai, seperti transfer melalui mobile banking, dompet digital (e-wallet), maupun QRIS karena dinilai lebih praktis, cepat, dan aman. Namun, Angkringan S1 belum menyediakan sistem pembayaran digital yang terintegrasi sehingga seluruh transaksi masih dilakukan menggunakan uang tunai. Akibatnya, pelanggan yang ingin melakukan pembayaran secara digital tidak dapat dilayani secara langsung, sementara apabila pembayaran dilakukan melalui transfer bank, proses verifikasi masih harus dilakukan secara manual oleh kasir. Kondisi tersebut tidak hanya memperlambat proses transaksi, tetapi juga meningkatkan risiko kesalahan verifikasi pembayaran dan kurang mampu memenuhi kebutuhan konsumen terhadap layanan pembayaran digital yang saat ini semakin umum digunakan.
+Berdasarkan permasalahan tersebut, diperlukan sebuah sistem informasi kasir berbasis web yang terintegrasi dengan Payment Gateway dengan konsep implementasi dua perangkat di area kasir (customer-facing dan cashier-facing) untuk mendukung proses transaksi secara lebih efektif dan efisien. Sistem ini memungkinkan pelanggan melakukan pemesanan dan memilih metode pembayaran langsung melalui layar yang dihadapkan kepadanya secara transparan, sementara kasir menggunakan perangkat utama untuk mengelola menu, memvalidasi transaksi, menyesuaikan stok, dan menyusun laporan penjualan secara lebih cepat dan akurat. Oleh karena itu, penelitian ini dilakukan sebagai upaya memberikan solusi terhadap permasalahan transaksi di Angkringan S1 melalui penerapan sistem kasir berbasis web yang mendukung transaksi mandiri dan pembayaran digital sehingga diharapkan dapat meningkatkan efisiensi operasional dan kualitas pelayanan kepada pelanggan.
+1.2 Rumusan Masalah
+Berdasarkan latar belakang yang telah diuraikan, maka rumusan masalah dalam penelitian ini adalah sebagai berikut:
+1.	Bagaimana merancang dan membangun sistem informasi kasir berbasis web yang memfasilitasi pemesanan langsung oleh pelanggan pada Angkringan S1?
+2.	Bagaimana mengimplementasikan payment gateway pada sistem informasi kasir tersebut agar dapat memfasilitasi transaksi non-tunai secara real-time?
+3.	Bagaimana tingkat efisiensi transaksi yang dihasilkan setelah sistem informasi kasir berbasis web ini diterapkan di Angkringan S1?
+
+
+1.3 Batasan Masalah
+Agar penelitian ini lebih terarah dan tidak menyimpang dari tujuan yang telah ditetapkan, maka ditetapkan beberapa batasan masalah sebagai berikut:
+1.	Sistem yang dibangun berbasis web diimplementasikan melalui dua perangkat (device) di area kasir: satu perangkat khusus yang menghadap pelanggan (sebagai antarmuka self-ordering dan pemilihan metode pembayaran) dan satu perangkat utama yang dioperasikan oleh kasir (untuk validasi pesanan, pengelolaan transaksi, dan menu).
+2.	Sistem dikembangkan menggunakan bahasa pemrograman PHP dengan framework Laravel versi 12 dan database MySQL.
+3.	Integrasi payment gateway menggunakan layanan pihak ketiga (Midtrans).
+4.	Sistem berfokus pada pemesanan oleh pelanggan, validasi pembayaran oleh kasir, manajemen ketersediaan menu, serta rekapitulasi laporan penjualan (harian/bulanan).
+5.	Sistem tidak membahas pembukuan akuntansi lanjutan (seperti jurnal umum, buku besar, pajak, atau payroll karyawan).
+1.4 Tujuan Penelitian
+Berdasarkan rumusan masalah yang telah ditetapkan, maka tujuan penelitian ini adalah:
+1.	Merancang dan mengimplementasikan sistem informasi kasir berbasis web yang memfasilitasi pemesanan langsung oleh pelanggan secara fungsional di Angkringan S1.
+2.	Mengintegrasikan Application Programming Interface (API) payment gateway guna mengotomatisasi konfirmasi pembayaran non-tunai.
+3.	Mengetahui tingkat efisiensi transaksi yang dihasilkan setelah sistem informasi kasir berbasis web ini diterapkan di Angkringan S1.
+1.5 Manfaat Penelitian
+Penelitian ini diharapkan dapat memberikan manfaat baik secara teoritis maupun praktis sebagai berikut:
+
+1.	Manfaat Teoritis 
+1)	Memberikan kontribusi bagi keilmuan Teknik Informatika, khususnya pada pengembangan arsitektur sistem informasi kasir berbasis web yang memisahkan antarmuka pelanggan dan kasir.
+2)	Menjadi referensi kajian akademis terkait integrasi API Payment Gateway menggunakan framework Laravel 12 pada sektor UMKM.
+2.	Manfaat Praktis 
+1)	Bagi Pemilik Angkringan S1: Mempermudah pengelolaan transaksi, mempercepat rekapitulasi laporan pendapatan, dan memantau pergerakan penjualan secara presisi.
+2)	Bagi Kasir/Karyawan: Meringankan beban kerja karena tidak perlu lagi mencatat pesanan pelanggan secara manual, sehingga kasir dapat berfokus pada pengawasan dan validasi transaksi yang masuk secara real-time.
+3)	Bagi Konsumen: Memberikan pengalaman pemesanan yang lebih interaktif dan transparan karena pelanggan dapat memilih menu, melihat harga, dan memastikan pesanannya secara langsung melalui layar khusus yang disediakan di meja kasir, serta kemudahan menyelesaikan transaksi melalui opsi pembayaran digital yang aman dan modern.
+1.6 Sistematika Penulisan
+Sistematika penulisan dalam proposal skripsi ini disusun secara terstruktur untuk memberikan gambaran yang jelas mengenai isi dan alur pembahasan pada setiap bab. Adapun sistematika penulisan tersebut adalah sebagai berikut:
+BAB I PENDAHULUAN 
+Bab ini berisi uraian mengenai latar belakang masalah terkait operasional pencatatan transaksi manual di Angkringan S1, rumusan masalah, batasan masalah yang berfokus pada pengembangan sistem informasi kasir berbasis web dan integrasi payment gateway, tujuan penelitian, serta manfaat penelitian secara teoritis maupun praktis. Bab ini menjadi landasan dan arah dalam pelaksanaan penelitian.
+BAB II TINJAUAN PUSTAKA 
+Bab ini membahas landasan teori yang mendukung perancangan sistem, meliputi konsep Sistem Informasi, Point of Sale (POS), Efisiensi Transaksi, Payment Gateway, dan Application Programming Interface (API). Selain itu, bab ini juga menguraikan teknologi pengembangan perangkat lunak yang digunakan (Laravel 12, Tailwind CSS, MySQL), pemodelan Unified Modeling Language (UML), metode pengujian sistem, serta tinjauan dari beberapa penelitian terdahulu yang relevan.
+BAB III METODOLOGI PENELITIAN 
+Bab ini menjelaskan tahapan operasional penelitian yang mencakup waktu dan tempat penelitian, kebutuhan perangkat keras dan lunak, serta metode pengumpulan data. Bab ini memaparkan secara rinci metode pengembangan sistem menggunakan pendekatan Waterfall, mulai dari analisis kebutuhan, perancangan sistem dengan UML, perancangan antarmuka dan basis data, implementasi, hingga tahapan pengujian menggunakan Black Box Testing.
+BAB IV HASIL DAN PEMBAHASAN 
+Bab ini menyajikan hasil implementasi dari sistem informasi kasir berbasis web yang telah dibangun. Pembahasan mencakup tampilan antarmuka pengguna (sisi pelanggan dan admin), deskripsi fungsionalitas fitur dan integrasi pembayaran digital secara real-time, pemaparan hasil pengujian sistem, serta analisis evaluasi mengenai tingkat efisiensi transaksi setelah sistem diterapkan di Angkringan S1.
+BAB V PENUTUP 
+Bab ini mengemukakan kesimpulan akhir dari keseluruhan proses penelitian yang menjawab rumusan masalah dan tujuan penelitian, serta memuat saran-saran konstruktif untuk perbaikan dan pengembangan sistem di masa mendatang.
+ 
+BAB II
+TINJAUAN PUSTAKA
+
+2.1 Landasan Teori
+2.1.1 Sistem
+Sistem merupakan suatu kesatuan yang terdiri dari komponen-komponen yang saling berinteraksi untuk mencapai suatu tujuan tertentu. sistem adalah gabungan dari beberapa elemen, komponen atau variabel yang saling terintegrasi guna membentuk sebuah satu kesatuan sehingga dapat tercapainya suatu tujuan dan sasaran operasional yang diharapkan [1].
+sistem adalah sekelompok elemen-elemen yang terintegrasi dengan tujuan yang sama untuk mencapai tujuan. Suatu sistem yang dibuat oleh manusia terdiri dari komponen-komponen yang saling bekerja sama dan membentuk satu kesatuan untuk memproses berbagai masukan menjadi keluaran atau informasi yang berguna [2].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa sistem adalah kumpulan dari berbagai elemen, prosedur, atau komponen yang saling berhubungan, berinteraksi, dan terintegrasi untuk memproses suatu aktivitas. Penerapan sebuah sistem yang terstruktur sangat diperlukan dalam suatu organisasi atau usaha agar setiap kegiatan dapat berjalan dengan terarah dan tujuan dapat tercapai secara lebih efektif dan efisien.
+2.1.2 Sistem Informasi
+Sistem informasi merupakan solusi digital yang digunakan untuk membantu proses pengelolaan data dan layanan agar menjadi lebih efektif, efisien, dan terintegrasi. Penerapan sistem informasi berbasis web mampu meningkatkan efisiensi proses kerja, mempercepat verifikasi data, meminimalkan kesalahan pencatatan, serta mempermudah pemantauan informasi secara terstruktur. Selain itu, sistem informasi juga berperan dalam mendukung pelayanan yang lebih transparan dan terorganisir melalui pemanfaatan teknologi informasi berbasis website [3]. 
+Sistem informasi merupakan kombinasi antara teknologi informasi, prosedur kerja, dan sumber daya manusia yang digunakan untuk mendukung kegiatan operasional, manajemen, serta pengambilan keputusan dalam suatu organisasi. Penerapan sistem informasi pada proses transaksi penjualan dapat meningkatkan efisiensi, akurasi, dan kecepatan transaksi, sekaligus mengurangi kesalahan pencatatan yang sering terjadi pada sistem manual. Selain itu, sistem informasi membantu proses pengolahan dan penyajian laporan menjadi lebih terstruktur, akurat, dan mudah diakses oleh pengguna [4].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa sistem informasi merupakan suatu sistem yang memanfaatkan teknologi informasi untuk mengelola, memproses, menyimpan, dan menyajikan data menjadi informasi yang bermanfaat bagi pengguna. Penerapan sistem informasi mampu mendukung efektivitas dan efisiensi operasional, meningkatkan akurasi pengolahan data, mempercepat proses kerja dan transaksi, serta meminimalkan kesalahan yang sering terjadi pada proses manual. Dengan demikian, sistem informasi menjadi salah satu komponen penting dalam mendukung pengelolaan dan pengambilan keputusan pada berbagai bidang organisasi maupun usaha.
+2.1.3 Kasir
+Kasir memegang peranan krusial dalam kelancaran operasional bisnis, khususnya dalam melayani pembayaran dan rekapitulasi data penjualan. pengertian kasir adalah seseorang yang bekerja melayani transaksi penjualan, di mana keberadaan peran atau fungsi kasir akan sangat membantu proses perhitungan dan memperkecil risiko kesalahan pencatatan [5].
+kasir adalah salah satu profesi yang bertugas mengurus transaksi dan menyimpan pembayaran seperti uang tunai maupun giro. Peran fungsional kasir dinilai mampu meningkatkan efisiensi kerja dalam melayani konsumen serta memaksimalkan pendataan transaksi penjualan secara sistematis [6].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa kasir adalah individu atau bagian dari sistem fungsional yang bertugas melayani, memproses, dan mencatat transaksi pembayaran dari pelanggan. Penerapan teknologi pada sistem kasir bertujuan untuk mengotomatisasi pencatatan transaksi, meningkatkan akurasi penerimaan pembayaran (baik tunai maupun digital), mempercepat alur pelayanan, dan memudahkan penyusunan laporan riwayat penjualan secara real-time dan terintegrasi.
+2.1.4 Efisiensi Transaksi
+Efisiensi transaksi merupakan kemampuan suatu sistem dalam mempercepat proses pencatatan dan pengelolaan transaksi sehingga aktivitas operasional dapat berjalan lebih efektif. Penerapan sistem Point of Sale (POS) berbasis web mampu meningkatkan efisiensi operasional melalui otomatisasi transaksi penjualan, pengelolaan stok barang, pencatatan pengeluaran operasional, serta penyusunan laporan penjualan dan laba rugi secara otomatis. Selain itu, sistem juga memudahkan pemantauan performa penjualan dan kondisi keuangan usaha secara lebih akurat dan real-time [7].
+Efisiensi transaksi berkaitan dengan kemampuan sistem dalam mengelola proses penjualan dan persediaan barang secara lebih cepat, akurat, dan terintegrasi dibandingkan metode manual. Penerapan sistem Point of Sales (POS) berbasis web dapat meningkatkan efisiensi operasional melalui otomatisasi transaksi penjualan, pembaruan stok barang secara real time, serta penyediaan laporan transaksi dan penjualan secara otomatis. Selain itu, sistem mampu meminimalkan kesalahan pencatatan, mempercepat pelayanan pelanggan, dan mendukung pengelolaan usaha yang lebih sistematis dan efisien [8].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa efisiensi transaksi merupakan kemampuan sistem dalam meningkatkan kecepatan, ketepatan, dan kemudahan proses transaksi melalui pemanfaatan teknologi informasi. Penerapan sistem Point of Sale (POS) mampu mengotomatisasi pencatatan transaksi, pengelolaan stok barang, serta penyusunan laporan secara real-time sehingga dapat mengurangi kesalahan pencatatan, meningkatkan akurasi data, mempercepat pelayanan pelanggan, dan mendukung pengambilan keputusan bisnis secara lebih efektif dan efisien.
+2.1.5 Payment Gateway
+Payment gateway merupakan sistem penyedia layanan pembayaran online yang berfungsi sebagai jembatan antara website penjual dengan lembaga keuangan untuk memproses transaksi secara aman dan efisien. Penerapan Midtrans payment gateway pada aplikasi e-commerce memungkinkan pelanggan melakukan pembayaran melalui berbagai metode seperti kartu kredit, transfer bank, dompet digital (GoPay), serta pembayaran melalui Indomaret dan Alfamart. Sistem ini dinilai mampu meningkatkan keamanan transaksi dan mempermudah pelanggan dalam melakukan pembayaran secara online [9].
+Payment gateway adalah metode pembayaran berbasis internet yang memungkinkan proses transaksi diverifikasi dan dicatat secara otomatis oleh sistem tanpa memerlukan konfirmasi pembayaran manual. Implementasi Midtrans pada aplikasi toko mas berbasis web mampu mempermudah transaksi pembayaran secara real-time, mengurangi risiko bukti pembayaran palsu, serta meningkatkan efisiensi kerja admin dalam proses verifikasi pembayaran. Selain itu, payment gateway juga memberikan kemudahan bagi pelanggan dalam melakukan transaksi online dengan berbagai metode pembayaran digital [10].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa payment gateway merupakan sistem pembayaran digital yang berfungsi sebagai penghubung antara pelanggan, penjual, dan lembaga keuangan untuk memproses transaksi online secara otomatis, aman, dan efisien. Penerapan payment gateway mampu mempermudah proses pembayaran digital, meningkatkan keamanan transaksi, mengurangi kesalahan verifikasi manual, serta meningkatkan efisiensi operasional dalam sistem penjualan berbasis web.
+2.1.6Teknologi Pengembangan Sistem
+A.	MySQL (database)
+MySQL merupakan salah satu perangkat lunak sistem manajemen basis data (Database Management System) yang digunakan untuk mengelola dan menyimpan data secara terstruktur. Penggunaan database MySQL pada sistem informasi penjualan mampu membantu proses pengolahan data transaksi, monitoring laporan keuangan, serta meningkatkan efisiensi pengelolaan data secara terkomputerisasi. Selain itu, MySQL memiliki kelebihan bersifat multi-user dan mendukung sistem jaringan sehingga cocok digunakan dalam pengembangan sistem informasi berbasis web [11].
+MySQL merupakan aplikasi manajemen sistem database yang banyak digunakan untuk menyimpan, memanipulasi, mencari, mengatur, dan menghapus data pada sistem informasi berbasis web. Penerapan PHP dan MySQL pada sistem informasi arsip dokumen mampu membantu proses penyimpanan dokumen digital menjadi lebih terorganisir, mudah dicari, dan lebih efisien dalam pengelolaan data. Selain itu, penggunaan MySQL mendukung sistem informasi agar dapat mengelola data secara cepat, terstruktur, dan mudah diakses oleh pengguna  [12].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa MySQL merupakan sistem manajemen basis data (Database Management System) yang digunakan untuk menyimpan, mengelola, dan memproses data secara terstruktur dalam suatu sistem informasi. Penggunaan MySQL mampu meningkatkan efisiensi pengolahan data, mempermudah pencarian informasi, serta mendukung pengembangan aplikasi berbasis web yang terintegrasi, cepat, dan terorganisir dengan baik. 
+B.	Tailwind (frontend)
+Tailwind CSS merupakan pustaka CSS yang memungkinkan proses desain dan pengembangan front-end website menjadi lebih cepat, responsif, dan efisien. Penggunaan Tailwind CSS pada sistem check-in online berbasis web mampu menghasilkan antarmuka yang interaktif, mudah digunakan, serta kompatibel pada berbagai perangkat. Selain itu, Tailwind CSS memberikan fleksibilitas kepada pengembang dalam menyesuaikan tampilan website melalui pendekatan utility-first sehingga proses pengembangan antarmuka menjadi lebih terstruktur dan responsif [13].
+Tailwind CSS merupakan framework CSS yang digunakan untuk membangun antarmuka pengguna (front-end) website secara responsif dan fleksibel sesuai kebutuhan sistem. Penerapan Tailwind CSS pada website store mampu mempercepat proses pembuatan tampilan website, mempermudah pengaturan tata letak, serta memberikan kenyamanan bagi pengguna melalui desain yang responsif pada berbagai platform perangkat. Selain itu, Tailwind CSS memanfaatkan utility classes yang memudahkan pengembang dalam merancang elemen antarmuka secara cepat dan efisien [14].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Tailwind CSS merupakan framework CSS berbasis utility first yang digunakan untuk membangun antarmuka website secara cepat, fleksibel, dan responsif. Penggunaan Tailwind CSS mampu mempermudah proses pengembangan front-end, meningkatkan efisiensi pembuatan desain antarmuka, serta memberikan pengalaman pengguna yang lebih baik melalui tampilan website yang responsif dan mudah digunakan pada berbagai perangkat.
+C.	Laravel (backend)
+Laravel merupakan framework berbasis bahasa pemrograman PHP yang digunakan untuk mempermudah proses pengembangan aplikasi web secara lebih efisien dan terstruktur. Laravel menerapkan konsep Model View Controller (MVC) yang memisahkan pengelolaan data, tampilan, dan logika program sehingga proses pengembangan sistem menjadi lebih terorganisir. Selain itu, Laravel menyediakan berbagai fitur keamanan seperti perlindungan terhadap SQL Injection, Cross Site Scripting (XSS), dan Cross Site Request Forgery (CSRF) yang membantu meningkatkan keamanan aplikasi berbasis web [15].
+Laravel merupakan framework PHP yang dirancang menggunakan arsitektur Model View Controller (MVC) untuk membantu pengembangan website menjadi lebih terstruktur dan efisien. Penggunaan Laravel mampu mempermudah pengorganisasian kode program, mempercepat proses pengembangan aplikasi web, serta memudahkan pemeliharaan dan pengembangan fitur sistem secara berkelanjutan. Selain itu, Laravel juga menyediakan fitur routing, autentikasi, dan manajemen basis data yang mendukung pengembangan aplikasi web secara dinamis dan responsif [16].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Laravel merupakan framework berbasis PHP yang digunakan untuk membangun aplikasi web secara terstruktur, efisien, dan mudah dikembangkan. Dengan menerapkan arsitektur Model View Controller (MVC), Laravel mampu membantu pengorganisasian kode program, meningkatkan keamanan aplikasi, mempercepat proses pengembangan sistem, serta mempermudah pemeliharaan dan pengembangan fitur pada aplikasi berbasis web.
+
+2.1.7 Unified Modeling Language (UML)
+A.	Pengertian UML 
+Unified Modelling Language (UML) merupakan alat perancangan sistem berorientasi objek yang digunakan untuk memvisualisasikan dan mendokumentasikan hasil analisis serta desain sistem dalam bentuk diagram. UML digunakan untuk membantu tim pengembang dalam berkomunikasi, mengeksplorasi desain sistem, dan memvalidasi arsitektur perangkat lunak yang akan dibangun. UML memiliki beberapa kategori diagram seperti structure diagram, behavior diagram, dan interaction diagram yang saling terintegrasi dalam menggambarkan sistem secara menyeluruh [17].
+Unified Modelling Language (UML) merupakan alat pemodelan sistem berorientasi objek yang digunakan dalam proses analisis dan perancangan perangkat lunak. UML berfungsi untuk membantu pendeskripsian dan desain sistem perangkat lunak, khususnya sistem yang dibangun menggunakan pendekatan object oriented programming. Selain itu, UML memiliki beberapa jenis diagram seperti use case diagram, class diagram, dan activity diagram yang digunakan untuk menggambarkan fungsi, aktivitas, dan struktur sistem secara visual sehingga mempermudah proses pengembangan perangkat lunak [18].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Unified Modelling Language (UML) merupakan bahasa pemodelan visual berbasis objek yang digunakan untuk menganalisis, merancang, dan mendokumentasikan sistem perangkat lunak. UML membantu pengembang dalam menggambarkan struktur, proses, dan interaksi sistem melalui berbagai diagram sehingga proses pengembangan sistem menjadi lebih terstruktur, mudah dipahami, dan sesuai dengan kebutuhan pengguna.
+
+
+B.	Use Case Diagram 
+Use Case Diagram merupakan pemodelan yang digunakan untuk mendeskripsikan interaksi antara aktor atau pengguna dengan sistem yang dibangun. Use Case Diagram digunakan untuk menggambarkan fungsi-fungsi yang dapat dijalankan oleh sistem serta membantu memahami kebutuhan pengguna terhadap sistem. Use Case Diagram dapat digunakan pada perancangan sistem informasi untuk menunjukkan hubungan antara pengguna dan fitur-fitur sistem, seperti pengelolaan data, transaksi, hingga penyusunan laporan [19].
+Use Case Diagram merupakan diagram yang digunakan untuk menggambarkan tingkah laku sistem serta memberikan visualisasi komunikasi antara aktor dengan fungsi-fungsi sistem. Use Case Diagram membantu dalam memahami bagaimana pengguna berinteraksi dengan sistem yang dirancang. Diagram ini dapat digunakan untuk menggambarkan aktivitas pengguna dalam sistem, seperti proses login, transaksi, pengelolaan data, dan pembuatan laporan sehingga kebutuhan fungsional sistem dapat dipahami dengan lebih jelas [20].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Use Case Diagram merupakan diagram dalam Unified Modelling Language (UML) yang digunakan untuk memvisualisasikan interaksi antara pengguna dengan sistem serta menggambarkan fungsi-fungsi utama yang tersedia pada sistem. Use Case Diagram membantu pengembang dalam memahami kebutuhan pengguna dan alur kerja sistem sehingga proses perancangan sistem menjadi lebih terstruktur, mudah dipahami, dan sesuai dengan kebutuhan yang telah ditentukan.
+Tabel 2. 1 Symbol Use Case Diagram.
+NO	  GAMBAR	NAMA	KETERANGAN
+1	
+ 	
+Actor	Orang, proses atau sistem lain yang berinteraksi dengan sistem informasi yang akan dibuat di luar sistem informasi itu sendiri.
+
+2	
+ 	
+Dependency	Hubungan dimana perubahan yang terjadi pada suatu elemen mandiri (independent) akan mempengaruhi elemen yang bergantung padanya
+elemen yang tidak mandiri (independent).
+
+3	
+ 	
+Generalization	Hubungan generalisasi dan spesialisasi (umum-khusus) antar dua buah use case dimana fungsi yang satu adalah fungsi yang lebih umum dari yang
+lainnya.
+4	<<include>>
+
+Include	Relasi use case tambahan ke sebuah use case dimana use case yang ditambahkan memerlukan use case ini
+untuk menjalankan fungsinya.
+
+5	
+<<extend>>
+
+ 
+	
+Extend	Relasi use case tambahan ke sebuah use case, dimana use case yang ditambahkan dapat berdiri sendiri.
+
+
+
+6	
+
+
+	
+Association	Komunikasi antar aktor dan use case yang berpartisipasi pada use case atau use case memiliki interaksi dengan aktor.
+
+7	
+	
+System	
+Menspesifikasikan paket yang menampilkan sistem secara terbatas.
+8	
+ 	
+Use Case	Deskripsi dari urutan aksi-aksi yang ditampilkan sistem yang menghasilkan suatu hasil yang terukur
+bagi suatu actor
+C.	Activity Diagram 
+Activity Diagram merupakan diagram yang digunakan untuk menggambarkan urutan aktivitas atau alur proses yang terjadi dalam suatu sistem. Diagram ini menunjukkan tahapan aktivitas, percabangan keputusan, serta hubungan antar aktivitas yang terjadi selama sistem berjalan. Activity Diagram digunakan untuk menggambarkan proses transaksi penjualan mulai dari login pengguna, pemilihan produk, proses pembayaran, hingga sistem menyimpan data transaksi dan menampilkan notifikasi pembayaran berhasil [21].
+Activity Diagram berfungsi untuk memvisualisasikan alur aktivitas dalam suatu sistem sehingga proses kerja sistem dapat dipahami secara lebih jelas dan terstruktur. Activity Diagram digunakan untuk menggambarkan aktivitas pengguna pada sistem inventory berbasis website, seperti proses login dan pengelolaan data barang, mulai dari pengguna memberikan input hingga sistem memberikan respon terhadap aktivitas yang dilakukan. Selain itu, Activity Diagram membantu pengembang dalam memahami alur proses bisnis dan interaksi pengguna dengan sistem secara sistematis [22].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Activity Diagram merupakan diagram dalam UML yang digunakan untuk menggambarkan alur aktivitas, proses kerja, dan interaksi pengguna dalam suatu sistem secara terstruktur. Activity Diagram membantu pengembang dalam memahami proses bisnis, urutan aktivitas, serta alur keputusan yang terjadi pada sistem sehingga proses perancangan sistem menjadi lebih jelas dan mudah dipahami.
+Tabel 2. 2 Symbol Activity Diagram.
+Symbol	Deskripsi
+Status Awal
+Status awal aktivitas system, sebuah diagram aktivitas memiliki sebuah status awal
+Aktivitas
+Aktivitas yang dilakukan sistem, aktivitas biasanya diawali dengan kata kerja
+Percabangan
+Asosiasi percabangan di mana jika ada pilihan aktivitas lebih dasi satu
+Status Akhir
+Status akhir yang dilakukan system, sebuah diagram aktivitas memiliki sebuah status akhir
+Penggabungan
+Asosiasi penggabungan, di mana lebih dari satu aktivitas digabungkan menjadi satu
+Swimlane
+Memisahkan organisasi bisnis yang bertanggung jawab terhadap aktivitas yang terjadi
+
+D.	Sequence Diagram 
+Sequence Diagram merupakan diagram yang memaparkan hubungan antar objek di dalam sistem beserta rangkaian pesan yang dikirimkan berdasarkan urutan waktu terjadinya proses. Diagram ini memberikan gambaran visual mengenai bagaimana sistem merespons tindakan dari pengguna atau aktor lainnya. Dalam Sequence Diagram, setiap objek atau aktor direpresentasikan dalam bentuk garis vertikal, sedangkan interaksi antar objek digambarkan menggunakan panah horizontal sesuai urutan proses yang berlangsung [23].
+Sequence Diagram digunakan untuk menunjukkan interaksi antar objek dalam suatu urutan waktu tertentu. Diagram ini dipakai untuk memodelkan alur kerja spesifik pada sistem, seperti proses pemesanan produk dalam sistem penjualan berbasis web. Dengan adanya Sequence Diagram, pengembang dapat memahami urutan langkah-langkah yang terjadi selama proses sistem berlangsung sehingga interaksi antar objek dan pengguna menjadi lebih jelas dan terstruktur [24].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Sequence Diagram merupakan diagram UML yang digunakan untuk menggambarkan interaksi antar objek dalam sistem berdasarkan urutan waktu tertentu. Diagram ini membantu pengembang dalam memahami alur komunikasi, proses pertukaran pesan, serta tahapan aktivitas yang terjadi antara pengguna dan sistem sehingga proses perancangan sistem dapat dilakukan secara lebih sistematis dan mudah dipahami.
+Tabel 2. 3 Simbol Sequence Diagram.
+NO	GAMBAR	NAMA	KETERANGAN
+
+1	
+ 	
+
+Actor	Orang, proses atau sistem lain yang berinteraksi dengan sistem informasi yang akan dibuat di luar sistem informasi itu sendiri.
+
+2	
+ 	
+LifeLine	
+Objek entity, antarmuka yang saling berinteraksi.
+
+3	
+Nama_objek: namakelas	
+Objek	Menyatakan objek yang berinteraksi oleh pesan.
+
+4	 	
+Message	Spesifikasi dari komunikasi antar objek yang memuat informasi-informasi tentang aktifitas yang terjadi
+
+5	
+ 	
+Message	Spesifikasi dari komunikasi antar objek yang memuat informasi-informasi  tentang  aktifitas  yang
+terjadi
+
+
+6	
+I:keluaran
+
+ 
+	
+
+Pesan tipe return	Menyatakan bahwa suatu objek yang telah menjalankan suatu operasi atau metode menghasilkan suatu kembalian ke objek tertentu, arah panah mengarah pada objek yang menerima kembalian.
+
+7	I: masukan
+
+ 
+	
+
+Pesan tipe send	Menyatakan bahwa suatu objek mengirim data/masukan/informasi ke objek lainnya, arah panah mengarah pada objek yang dikirim.
+
+8	
+ 
+I:nama_metode()	
+Pesan tipe call	Menyatakan suatu objek memanggil operasi/metode yang ada pada objek lain atau dirinya sendiri.
+
+E.	Class Diagram 
+Class Diagram digunakan untuk memodelkan kelas-kelas di dalam sistem beserta atribut, metode, dan hubungan antar kelas. Penerapan Class Diagram dalam perancangan sistem informasi diharapkan dapat menghasilkan model sistem yang jelas, terstruktur, dan mudah dipahami sehingga menjadi dasar yang kuat dalam pengembangan serta implementasi sistem informasi yang efektif [25].
+Class Diagram merupakan salah satu jenis diagram statis pada UML yang berfungsi untuk menunjukkan struktur sistem melalui sekumpulan kelas, atribut, metode, serta hubungan antar kelas di dalam perangkat lunak. Diagram ini digunakan untuk memperlihatkan bagaimana elemen-elemen sistem saling berinteraksi secara logis dan menjadi dasar dalam proses perancangan maupun pengkodean sistem agar lebih terstruktur dan mudah dipahami oleh pengembang [26].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Class Diagram merupakan diagram UML yang digunakan untuk menggambarkan struktur statis sistem melalui kumpulan kelas, atribut, metode, dan hubungan antar kelas. Class Diagram membantu pengembang dalam memahami struktur data dan hubungan antar komponen sistem sehingga proses perancangan dan implementasi sistem dapat dilakukan secara lebih terstruktur, jelas, dan sistematis.
+Tabel 2. 4 Symbol Class Diagram.
+NO	GAMBAR	NAMA	KETERANGAN
+
+1	
+ 	
+Association	Hubungan antar kelas dengan makna umum, asosiasi biasanya
+juga disertai dengan multiplicity.
+
+2	
+ 	
+Nary Association	Upaya	untuk	menghindari
+asosiasi dengan lebih dari 2 objek.
+
+3	
+ 	
+Class	Himpunan dari objek-objek yang berbagi atribut serta operasi yang
+sama.
+4	
+ 	Realization	Operasi	yang	benar-benar
+dilakukan oleh suatu objek.
+
+
+
+5	
+
+
+
+ 	
+
+
+Dependency	Hubungan dimana perubahan yang terjadi pada suatu elemen mandiri (independent) akan mempengaruhi elemen yang bergantung  padanya  elemen
+yang tidak mandiri
+
+
+
+6	
+
+
+
+ 	
+
+
+Generalization	Hubungan generalisasi dan spesialisasi (umum-khusus) antar dua buah use case dimana fungsi yang satu adalah fungsi yang  lebih  umum  dari  yang
+lainnya.
+
+7	
+ 	Agregasi/aggreg ation	Hubungan antar kelas dengan makna	semua-bagian	(whole
+part)
+2.1.8 Pengujian Sistem
+Black Box Testing merupakan teknik pengujian fungsional yang dirancang berdasarkan spesifikasi sistem tanpa perlu mengetahui struktur internal dari sistem tersebut. Pengujian ini dilakukan untuk memastikan bahwa setiap fungsi pada sistem berjalan sesuai dengan kebutuhan pengguna dan mampu mengidentifikasi kesalahan fungsional secara efektif [27].
+Black Box Testing adalah metode pengujian yang memverifikasi hasil eksekusi aplikasi berdasarkan data masukan untuk memastikan bahwa fungsi aplikasi telah berjalan sesuai dengan persyaratan yang ditentukan. Pengujian ini berfokus pada antarmuka aplikasi, fungsionalitas sistem, serta kesesuaian alur kerja tanpa memeriksa kode sumber program [28].
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa Black Box Testing merupakan metode pengujian perangkat lunak yang dilakukan dengan menguji fungsi sistem berdasarkan input dan output tanpa melihat struktur internal atau kode program. Pengujian ini bertujuan untuk memastikan bahwa sistem berjalan sesuai kebutuhan pengguna, mampu mendeteksi kesalahan fungsi, serta meningkatkan kualitas dan keandalan perangkat lunak sebelum diimplementasikan.
+2.1.9 Metode Pengembangan Sistem(waterfall) 
+Metode Waterfall merupakan metode pengembangan sistem yang dilakukan secara terstruktur dan bertahap, di mana setiap tahapan harus diselesaikan terlebih dahulu sebelum melanjutkan ke tahapan berikutnya. Metode Waterfall memiliki beberapa tahapan utama seperti analisis kebutuhan sistem, perancangan sistem, implementasi, pengujian, hingga pemeliharaan sistem. Selain itu, pendekatan Waterfall membantu proses pengembangan perangkat lunak menjadi lebih terarah, sistematis, dan mudah dikendalikan selama proses pengembangan berlangsung [29].
+Metode Waterfall merupakan salah satu model Software Development Life Cycle (SDLC) yang digunakan dalam pengembangan sistem informasi dengan pendekatan yang berjalan secara sistematis dan berurutan. Metode Waterfall terdiri dari beberapa tahapan yang bersifat linear, di mana tahap selanjutnya baru dapat dilaksanakan setelah tahap sebelumnya selesai, mulai dari tahap analisis kebutuhan (requirement), perancangan sistem (design), implementasi (implementation), pengujian (verification), hingga pemeliharaan sistem (maintenance). Melalui pendekatan yang linear dan terstruktur ini, pengembangan sistem informasi kasir dapat dilaksanakan secara bertahap dan terencana, sehingga meminimalisasi kesalahan dan memastikan sistem yang dibangun beroperasi secara efektif sesuai dengan kebutuhan pengguna [30]
+Berdasarkan uraian tersebut, dapat disimpulkan bahwa metode Waterfall merupakan metode pengembangan perangkat lunak yang dilakukan secara bertahap dan sistematis melalui tahapan analisis kebutuhan, perancangan, implementasi, pengujian, hingga pemeliharaan sistem. Metode ini membantu proses pengembangan sistem menjadi lebih terstruktur, mudah dikontrol, dan sesuai dengan kebutuhan pengguna sehingga banyak digunakan dalam pengembangan sistem informasi berbasis web.
+2.2 Penelitian Terdahulu 
+Penelitian terkait pengembangan sistem informasi berbasis web, marketplace, dan Point of Sale (POS) pada UMKM telah banyak dilakukan menggunakan berbagai metode pengembangan sistem dan teknologi web. Penelitian-penelitian tersebut menjadi landasan penting dalam memahami bagaimana digitalisasi sistem penjualan, pengelolaan transaksi, serta integrasi layanan berbasis web dapat meningkatkan efisiensi operasional usaha. Selain itu, penelitian terdahulu juga menunjukkan bahwa penggunaan framework modern, sistem POS, dan marketplace berbasis website mampu membantu UMKM dalam mengelola transaksi, memperluas pemasaran, serta meningkatkan kualitas layanan pelanggan secara lebih efektif dan terintegrasi.
+1.	Anas Turmudzi melalui penelitian berjudul Perancangan dan Implementasi Marketplace dengan Sistem Mini POS Terintegrasi Untuk Usaha Digital Printing merancang sistem marketplace yang terintegrasi dengan Mini Point of Sale (POS) untuk membantu pengelolaan operasional usaha digital printing. Penelitian tersebut menunjukkan bahwa integrasi marketplace dan POS mampu meningkatkan efisiensi operasional, mengurangi kesalahan pengelolaan data, serta membantu UMKM dalam mengelola transaksi dan stok barang secara lebih sistematis [31].
+2.	Muhammad Khadafi melalui penelitian berjudul Rancang Bangun Sistem Penjualan E-Commerce Berbasis Website Menggunakan Framework Laravel mengembangkan sistem e-commerce berbasis website menggunakan framework Laravel dan metode Waterfall. Penelitian tersebut menunjukkan bahwa sistem e-commerce mampu membantu digitalisasi penjualan, memperluas jangkauan pelanggan, serta meningkatkan efektivitas pengelolaan transaksi penjualan berbasis web [32].
+3.	Fadli Muhammad melalui penelitian berjudul Inovasi Teknologi dalam Manajemen Penjualan: Aplikasi Point of Sales Berbasis Web untuk UMKM mengembangkan aplikasi POS berbasis web untuk membantu pengelolaan transaksi penjualan UMKM secara digital. Hasil penelitian menunjukkan bahwa sistem POS berbasis web mampu membantu pengelolaan stok barang, transaksi penjualan, serta mendukung efisiensi operasional dan pengelolaan laporan penjualan secara real time [33].
+4.	Primula Juventauricula melalui penelitian berjudul Rancang Bangun Aplikasi Point of Sale (POS App) Berbasis Progressive Web App untuk UMKM mengembangkan aplikasi POS berbasis Progressive Web App (PWA) menggunakan framework Laravel dan metode Waterfall. Penelitian tersebut menunjukkan bahwa sistem POS berbasis PWA mampu memberikan kemudahan akses, meningkatkan fleksibilitas penggunaan sistem, serta membantu proses transaksi penjualan menjadi lebih cepat dan efisien bagi UMKM [34].
+5.	Rayhan Achmad melalui penelitian berjudul Aplikasi Web Laravel untuk Pemesanan dan Manajemen Produk UMKM merancang dan mengembangkan sistem pemesanan serta manajemen produk berbasis web menggunakan framework Laravel pada UMKM kuliner “Bakso Mas Kubil”. Penelitian tersebut menunjukkan bahwa aplikasi web yang dikembangkan mampu membantu digitalisasi proses pemesanan, checkout, serta manajemen produk secara lebih efisien. Selain itu, sistem juga mampu meningkatkan efisiensi operasional, mengurangi kesalahan pencatatan transaksi, serta memperluas jangkauan layanan pemesanan berbasis digital [35].
+Berdasarkan uraian tersebut, dapat diketahui bahwa pengembangan sistem marketplace, e-commerce, dan Point of Sale (POS) berbasis web telah dilakukan menggunakan berbagai metode dan teknologi seperti Laravel, Progressive Web App (PWA), serta metode Waterfall dan Prototype. Namun, sebagian besar penelitian masih berfokus pada pengelolaan transaksi penjualan, marketplace, dan sistem POS secara umum tanpa mengintegrasikan layanan pembayaran digital secara langsung melalui Payment Gateway. Selain itu, penelitian yang secara khusus membahas integrasi sistem informasi kasir berbasis web dengan Payment Gateway untuk meningkatkan efisiensi transaksi pada usaha F&B masih terbatas. Oleh karena itu, penelitian ini dilakukan untuk mengembangkan sistem informasi kasir berbasis web yang terintegrasi dengan Payment Gateway guna mendukung proses transaksi digital yang lebih cepat, akurat, dan efisien pada Angkringan S1.
+Tabel 2. 5 Perbedaan Penelitian Relevan.
+No	Peneliti	Judul Penelitian	Perbedaan Utama dengan Penelitian Ini
+1	Anas Turmudzi	Perancangan dan Implementasi Marketplace dengan Sistem Mini POS Terintegrasi Untuk Usaha Digital Printing	Penelitian tersebut berfokus pada pengembangan marketplace dan mini POS untuk usaha digital printing, sedangkan penelitian ini berfokus pada pengembangan sistem informasi kasir berbasis web yang terintegrasi dengan Payment Gateway untuk meningkatkan efisiensi transaksi pada usaha F&B.
+2	
+Muhammad Khadafi
+	Rancang Bangun Sistem Penjualan E-Commerce Berbasis Website Menggunakan Framework Laravel	Penelitian tersebut berfokus pada pengembangan sistem e-commerce berbasis website menggunakan Laravel tanpa integrasi Payment Gateway, sedangkan penelitian ini mengintegrasikan sistem kasir dengan Payment Gateway untuk mendukung transaksi digital secara real-time.
+3	
+Fadli Muhammad
+	Inovasi Teknologi dalam Manajemen Penjualan: Aplikasi Point of Sales Berbasis Web untuk UMKM	Penelitian tersebut berfokus pada pengelolaan transaksi dan stok barang menggunakan sistem POS berbasis web, sedangkan penelitian ini menambahkan integrasi Payment Gateway sebagai fitur utama untuk mendukung pembayaran digital pada sistem kasir.
+4	Primula Juventauricula	Rancang Bangun Aplikasi Point of Sale (POS App) Berbasis Progressive Web App untuk UMKM	Penelitian tersebut berfokus pada pengembangan aplikasi POS berbasis Progressive Web App (PWA), sedangkan penelitian ini berfokus pada sistem informasi kasir berbasis web dengan integrasi API Payment Gateway untuk meningkatkan efisiensi transaksi digital.
+5	Rayhan Achmad	Aplikasi Web Laravel untuk Pemesanan dan Manajemen Produk UMKM	Penelitian tersebut berfokus pada sistem pemesanan dan manajemen produk UMKM berbasis Laravel tanpa integrasi Payment Gateway, sedangkan penelitian ini mengembangkan sistem informasi kasir berbasis web yang terintegrasi dengan Payment Gateway untuk mendukung transaksi pembayaran digital secara otomatis dan real-time pada usaha F&B.
+
+ 
+BAB III
+METODOLOGI PENELITIAN
+
+3.1 Waktu dan Tempat Penelitian
+3.1.1 Waktu Penelitian 
+Waktu pelaksanaan penelitian ini dimulai pada bulan Juli sampai Agustus. Kegiatan penelitian meliputi proses observasi, wawancara, pengumpulan referensi, analisis kebutuhan sistem, perancangan sistem, implementasi sistem, integrasi Payment Gateway, pengujian sistem, hingga penyusunan laporan skripsi.
+3.1.2 Tempat Penelitian
+Penelitian ini dilaksanakan di Angkringan S1 yang berlokasi di Jl. Ir. Sutami, Sidorejo, Kecamatan Sekampung Udik, Kabupaten Lampung Timur, Lampung 34385. Angkringan S1 merupakan usaha yang bergerak pada bidang Food and Beverage (F&B) yang menyediakan berbagai menu makanan dan minuman. Pemilihan lokasi penelitian dilakukan karena proses transaksi pada Angkringan S1 masih dilakukan secara manual sehingga diperlukan pengembangan sistem informasi kasir berbasis web yang terintegrasi dengan Payment Gateway untuk meningkatkan efisiensi transaksi dan pengelolaan laporan penjualan. 
+ 
+Gambar 3. 1 Peta Angkringan S1.
+https://maps.app.goo.gl/DFJR9NpfiimPg2hVA
+3.2 Alat dan Bahan Penelitian
+3.2.1 Perangkat Keras (Hardware)
+Perangkat keras yang digunakan dalam penelitian ini digunakan untuk mendukung proses perancangan, pengembangan, implementasi, dan pengujian sistem informasi kasir berbasis web menggunakan Payment Gateway pada Angkringan S1. Adapun spesifikasi perangkat keras yang digunakan dalam penelitian ini dapat dilihat pada Tabel 3.1.
+Tabel 3. 1 Perangkat Keras (Hardware).
+No	Perangkat	Spesifikasi
+1	Laptop	ThinkPad X250
+2	Prosesor	Intel core i5 5300U
+3	RAM	8 GB
+4	Storage	256 GB
+3.2.2 Perangkat Lunak (Software)
+Perangkat lunak yang digunakan dalam penelitian ini digunakan untuk mendukung proses pengembangan sistem informasi kasir berbasis web, pengelolaan basis data, integrasi Payment Gateway, serta proses pengujian sistem. Adapun perangkat lunak yang digunakan dalam penelitian ini dapat dilihat pada Tabel 3.2.
+Tabel 3. 2 Perangkat Lunak (Software).
+No	Software	Fungsi
+1	Visual Studio Code	Editor source code program
+2	Laravel 12	Framework backend sistem
+3	PHP 8.1	Bahasa pemrograman backend
+4	MySQL	Sistem manajemen basis data
+5	Laragon	Local development environment
+6	Postman	Pengujian API Payment Gateway
+7	Git	Version control sistem
+8	GitHub	Repository penyimpanan source code
+9	Tailwind CSS	Framework frontend antarmuka pengguna
+
+3.3 Metode Pengumpulan Data
+3.3.1 Observasi
+Metode observasi langsung di Angkringan S1 mengungkapkan bahwa sistem transaksi manual yang meliputi pencatatan pesanan, pembayaran, dan pembuatan laporan mengakibatkan antrean panjang saat ramai, rentan terhadap kesalahan pencatatan, serta memperlambat penyusunan laporan penjualan.
+3.3.2 Wawancara
+Wawancara langsung dengan pemilik dan kasir Angkringan S1 dilakukan untuk mengidentifikasi kendala transaksi serta kebutuhan fitur kasir, pembayaran digital, dan pelaporan, yang hasilnya dijadikan landasan analisis agar sistem yang dikembangkan sesuai dengan kebutuhan pengguna.
+3.3.3 Studi Pustaka
+Studi pustaka dilakukan dengan mengkaji berbagai literatur terkait sistem kasir, Payment Gateway, Laravel, UML, Black Box Testing, dan metode Waterfall guna membangun landasan teori yang mendukung pengembangan sistem informasi kasir berbasis web di Angkringan S1.
+3.4 Metode Penelitian
+Metode penelitian yang digunakan pada penelitian ini adalah metode penelitian deskriptif dengan pendekatan pengembangan sistem. Metode deskriptif digunakan untuk menggambarkan permasalahan yang terjadi pada sistem transaksi di Angkringan S1, khususnya pada proses pencatatan transaksi, pembayaran, dan pembuatan laporan penjualan yang masih dilakukan secara manual.
+Pada penelitian ini dilakukan pengembangan sistem informasi kasir berbasis web yang terintegrasi dengan Payment Gateway untuk membantu proses transaksi menjadi lebih cepat, akurat, dan efisien. Sistem yang dikembangkan difokuskan pada pengelolaan menu, transaksi kasir, pembayaran digital, serta laporan penjualan harian dan bulanan.
+Metode pengembangan sistem yang digunakan dalam penelitian ini adalah metode Waterfall. Metode tersebut dipilih karena memiliki tahapan pengembangan yang terstruktur dan sistematis mulai dari analisis kebutuhan, perancangan sistem, implementasi, hingga pengujian sistem sehingga sesuai digunakan dalam pengembangan sistem informasi kasir berbasis web pada Angkringan S1.
+3.5 Metode Pengembangan Sistem
+3.5.1 Metode Waterfall
+Metode Waterfall merupakan metode pengembangan perangkat lunak yang dilakukan secara bertahap dan berurutan, di mana setiap tahapan harus diselesaikan terlebih dahulu sebelum melanjutkan ke tahap berikutnya. Pada penelitian ini, metode Waterfall digunakan dalam pengembangan sistem informasi kasir berbasis web menggunakan Payment Gateway pada Angkringan S1. Metode ini dipilih karena memiliki tahapan pengembangan yang terstruktur sehingga memudahkan proses perancangan dan pembangunan sistem sesuai dengan kebutuhan pengguna.
+ 
+Gambar 3. 2 waterfall.
+Berdasarkan Gambar 3.2, penerapan metode Waterfall pada penelitian ini memiliki alur yang sistematis dan berurutan, dimulai dari tahap analisis kebutuhan sistem berdasarkan hasil observasi dan wawancara terhadap proses transaksi pada Angkringan S1. Setelah kebutuhan sistem diperoleh, dilanjutkan dengan tahap perancangan sistem menggunakan Unified Modelling Language (UML), perancangan basis data, serta perancangan antarmuka pengguna. Tahap berikutnya adalah implementasi sistem menggunakan framework Laravel, database MySQL, dan integrasi API Payment Gateway untuk mendukung proses pembayaran digital. Setelah proses implementasi selesai, dilakukan tahap pengujian sistem menggunakan metode Black Box Testing untuk memastikan seluruh fungsi berjalan dengan baik sesuai kebutuhan. Tahap terakhir dari alur ini adalah penerapan sistem pada lingkungan operasional Angkringan S1 yang kemudian dilanjutkan dengan tahap pemeliharaan (maintenance) untuk melakukan perawatan, memperbaiki kesalahan, serta meningkatkan kinerja sistem agar terus berjalan secara optimal.
+3.5.2 Analisis Kebutuhan Sistem
+Analisis kebutuhan sistem menjabarkan spesifikasi, fungsi utama, proses operasional, serta batasan teknis dari sistem informasi kasir berbasis web yang dikembangkan di Angkringan S1. Sistem ini dirancang untuk memfasilitasi dua aktor utama, yaitu Admin (Kasir) dan User (Pelanggan), serta berinteraksi dengan entitas eksternal berupa Payment Gateway (Midtrans).
+Dari sisi pengguna atau pelanggan, sistem difasilitasi melalui perangkat keras khusus yang disediakan di area meja kasir dan dihadapkan langsung kepada pembeli (customer facing display). Melalui layar perangkat tersebut, pembeli dapat melakukan pemesanan secara mandiri (selfordering) tanpa memerlukan proses registrasi atau login. Pelanggan dapat menelusuri daftar menu, mengecek sisa stok, dan menentukan pesanan. Sistem akan mengkalkulasi total tagihan secara otomatis dan mencegah pelanggan melakukan checkout apabila jumlah pesanan melebihi stok yang tersedia. Saat proses checkout, pelanggan dapat langsung memilih metode pembayaran di layar tersebut, baik secara tunai (cash) maupun secara digital. Selain itu, pelanggan dapat membatalkan pesanan secara mandiri selama transaksi tersebut masih berstatus Pending.
+Dari sisi pengelola, sistem menyediakan akses tertutup berupa halaman login terenkripsi bagi admin untuk masuk ke dashboard utama. Melalui dashboard tersebut, admin memiliki wewenang untuk mengelola data menu beserta kategorinya, melakukan penyesuaian stok secara manual, dan memantau daftar transaksi masuk secara real-time tanpa perlu memuat ulang halaman (refresh). Admin juga difasilitasi fitur untuk memvalidasi pembayaran tunai, membatalkan pesanan yang belum dibayar, mencetak struk transaksi berformat PDF untuk pesanan yang telah berstatus Paid, serta memantau riwayat transaksi untuk rekapitulasi laporan penjualan harian dan bulanan.
+Dalam hal pemrosesan transaksi dan pembayaran, alur sistem dibedakan berdasarkan metode yang dipilih pelanggan. Untuk pembayaran tunai, transaksi akan tersimpan dengan status awal Pending dan akan tertahan hingga admin menerima uang secara fisik lalu mengonfirmasinya di sistem. Konfirmasi admin ini otomatis mengubah status pesanan menjadi Paid dan memotong stok menu. Sedangkan untuk pembayaran digital, sistem akan mengirim request ke API Midtrans. Saat pembayaran berhasil, sistem akan menerima respons balik (callback) dari Midtrans yang secara otomatis mengubah status pesanan menjadi Paid dan mengurangi stok menu secara presisi tanpa intervensi admin.
+Untuk memastikan kelancaran operasional di Angkringan S1, sistem ini juga dirancang dengan spesifikasi kinerja dan keandalan yang tinggi. Antarmuka pengguna dibangun menggunakan pendekatan responsive web design (berbasis framework Tailwind CSS) sehingga tampilannya akan menyesuaikan secara proporsional. Tampilan antarmuka pelanggan dioptimalkan untuk perangkat yang menghadap pembeli (seperti tablet atau layar sentuh), sedangkan antarmuka admin dioptimalkan untuk laptop operasional kasir. Dari aspek keamanan dan integritas, sistem membatasi hak akses secara ketat, mengamankan jalur pertukaran data API dengan Midtrans, serta menjaga konsistensi pengolahan data pada database MySQL untuk meminimalisasi crash dan mencegah selisih dalam pencatatan stok maupun pendapatan harian.
+3.5.3 Perancangan Sistem dan Basis Data
+A.	Perancangan Use Case Diagram
+Perancangan Use Case Diagram digunakan untuk memvisualisasikan batasan hak akses serta interaksi fungsional antara aktor dengan sistem informasi kasir berbasis web yang dikembangkan di Angkringan S1. Tanpa merinci proses teknis di baliknya, diagram ini memetakan aktivitas dari empat aktor utama yang terlibat, yaitu User (Pelanggan), Kasir, Admin, dan satu entitas eksternal berupa Payment Gateway (Midtrans).
+ 
+Gambar 3. 3 Use Case Diagram.
+Interaksi pada sistem di sisi antarmuka depan (frontend) dilakukan oleh aktor User (Pelanggan) yang dapat melakukan pemesanan mandiri (selfordering) tanpa perlu melakukan registrasi atau login. Pelanggan memiliki akses untuk melihat dan memilih menu, menambahkannya ke keranjang sesuai sisa stok, melakukan checkout agar sistem menghitung total tagihan, serta memilih metode pembayaran secara tunai maupun digital. Selain itu, pelanggan juga diberikan fasilitas untuk membatalkan pesanannya secara mandiri dengan syarat status transaksi tersebut masih berada dalam kondisi Pending. 
+Pada sisi operasional (backend), sistem dikelola oleh dua aktor dengan hak akses yang berbeda, yaitu Kasir dan Admin, yang keduanya diwajibkan melakukan login ke dalam sistem. Aktor Kasir difokuskan pada pengelolaan transaksi harian, yang meliputi tugas memantau transaksi masuk secara real-time, mengonfirmasi pembayaran tunai (cash), membatalkan pesanan yang belum terbayar, dan mencetak struk transaksi berformat PDF. Sementara itu, aktor Admin memiliki wewenang pada tingkat manajerial, yaitu bertugas untuk menambah, mengubah, atau menghapus data kategori dan menu, menyesuaikan ketersediaan stok, serta mengakses rekapitulasi riwayat transaksi untuk melihat laporan penjualan harian dan bulanan. 
+Sistem ini juga berinteraksi dengan aktor eksternal berupa sistem Payment Gateway (Midtrans) yang bertugas memproses dan memvalidasi opsi pembayaran digital. Ketika pelanggan telah berhasil menyelesaikan proses transfer atau pemindaian pembayaran digital, Payment Gateway akan langsung mengirimkan respons balik (callback) secara asinkron ke sistem utama. Sinyal otomatis ini memicu sistem untuk segera memperbarui status pesanan menjadi Paid sekaligus mengurangi ketersediaan stok menu, sehingga keseluruhan validasi transaksi digital dapat diselesaikan secara efisien tanpa memerlukan campur tangan konfirmasi manual dari Kasir. 
+B.	Perancangan Activity Diagram 
+Activity Diagram pada sistem informasi kasir berbasis web Angkringan S1 berfungsi untuk memetakan alur kerja sistem secara keseluruhan secara praktis. Diagram ini memvisualisasikan urutan proses dan interaksi langsung antara pelanggan, sistem kasir, admin, serta payment gateway, yang mencakup siklus dari tahap awal pemilihan menu hingga transaksi dinyatakan selesai atau dibatalkan.
+
+ 
+Gambar 3. 4 Activity Diagram.
+Berdasarkan gambar di atas, alur aktivitas dimulai saat pelanggan berinteraksi dengan layar pemesanan di meja kasir untuk memilih menu dan melakukan checkout. Sistem akan langsung memvalidasi ketersediaan stok secara otomatis sebelum menghitung total pembayaran. Jika pelanggan memilih metode pembayaran tunai, transaksi akan tersimpan dengan status Pending, dan pelanggan menyerahkan uang fisik kepada kasir yang berada di depannya. Admin kemudian menekan tombol konfirmasi di dashboard agar sistem mengubah status menjadi Paid, memotong stok, serta menyiapkan cetak struk PDF. Sebaliknya, untuk metode pembayaran digital, sistem akan mengirimkan request ke API Midtrans untuk menampilkan QR Code pembayaran di layar pelanggan. Callback respons sukses dari payment gateway akan secara otomatis merubah status menjadi Paid dan mengurangi stok tanpa memerlukan konfirmasi manual dari admin. Selama transaksi masih berstatus Pending, baik pelanggan maupun admin dapat melakukan pembatalan yang akan menghentikan proses dan mengubah status menjadi Cancelled tanpa mengurangi persediaan barang. Keseluruhan aktivitas operasional ini terpusat dan dapat dikelola oleh admin melalui akses login dashboard yang memungkinkan pemantauan status transaksi secara real-time, penyesuaian stok secara manual, pengelolaan data menu, hingga peninjauan rekapitulasi laporan penjualan berkala.
+C.	Perancangan Sequence Diagram 
+Perancangan Sequence Diagram digunakan untuk menggambarkan alur komunikasi dan interaksi antar objek di dalam sistem informasi kasir berbasis web berdasarkan urutan waktu kejadian. Diagram ini secara spesifik memetakan bagaimana aliran request dan response bergerak melintasi antarmuka pengguna (frontend), kontroler sistem (backend), basis data (database), entitas admin, hingga API pihak ketiga (Payment Gateway Midtrans).
+ 
+Gambar 3. 5 Sequence Diagram.
+Alur interaksi pada sistem ini diawali dengan skenario pemesanan ketika pelanggan membuka halaman web. Sistem (frontend) akan mengirimkan permintaan ke database untuk mengambil dan memuat daftar menu beserta informasi ketersediaan stoknya. Saat pelanggan mulai memilih menu, sistem akan memvalidasi sisa stok secara real-time. Proses ini berlanjut hingga pelanggan melakukan checkout, di mana sistem akan mengkalkulasi total harga pesanan dan mengarahkan pelanggan untuk memilih metode pembayaran.
+Setelah metode pembayaran dipilih, alur komunikasi akan terbagi berdasarkan opsi yang digunakan. Apabila pelanggan memilih pembayaran tunai (cash), sistem akan menyimpan data transaksi baru ke dalam database dengan status awal Pending dan memunculkan notifikasi agar pelanggan menuju meja kasir. Di saat yang sama, pada perangkat admin yang membuka dashboard, sistem akan menarik data transaksi Pending tersebut dari database. Ketika admin menerima uang tunai dan menekan tombol konfirmasi, sistem akan mengirim perintah lanjutan ke database untuk memperbarui status transaksi menjadi Paid, mengurangi jumlah stok menu secara bersamaan, serta merender data ke format PDF agar struk dapat dicetak.
+Sebaliknya, jika metode pembayaran digital yang dipilih, urutan interaksi menjadi lebih kompleks karena melibatkan pihak ketiga. Setelah menyimpan transaksi sebagai Pending, sistem bagian backend akan menyusun parameter transaksi dan menembakkan request API ke server Midtrans. Midtrans kemudian memproses request tersebut dan mengembalikan response berupa token atau tautan QR Code yang langsung ditampilkan kepada pelanggan. Begitu pelanggan berhasil mentransfer dana melalui m-banking atau dompet digital, Midtrans akan mengirimkan HTTP Callback atau Webhook secara asinkron ke sistem backend. Sistem yang menerima callback ini akan langsung memvalidasi keabsahannya, lalu secara otomatis menginstruksikan database untuk mengubah status menjadi Paid dan memotong sisa stok menu.
+Selain proses pemesanan dan pembayaran, interaksi sistem juga mengakomodasi skenario pembatalan transaksi. Apabila sebuah transaksi yang masih berstatus Pending dibatalkan (baik ditekan oleh pelanggan maupun admin), sistem akan menerima instruksi pembatalan tersebut dan mengirimkan query ke database. Sistem kemudian memperbarui status transaksi menjadi Cancelled dan memberikan response balik ke tampilan antarmuka bahwa pesanan telah resmi dibatalkan tanpa mengurangi persediaan barang. Dengan memodelkan seluruh interaksi ini melalui Sequence Diagram, alur request ke API Midtrans, proses validasi pembayaran, hingga pembaruan database dapat dipahami secara terstruktur sebelum diimplementasikan ke dalam penulisan kode program.
+D.	Perancangan Class Diagram
+Class Diagram digunakan untuk menggambarkan struktur kelas (class) di dalam sistem informasi kasir berbasis web yang dikembangkan pada Angkringan S1. Diagram ini memetakan kelas-kelas utama pembentuk sistem, atribut (properti/data) yang dimiliki oleh masing-masing kelas, operasi (method/fungsi) yang dapat dilakukan, serta hubungan (relasi) antar kelas tersebut.
+Secara garis besar, arsitektur sistem ini dibentuk oleh beberapa kelas utama yang saling berelasi, yaitu Admin, Kasir, User, Kategori, Menu, Transaksi, Detail_Transaksi, dan Laporan. Meskipun pelanggan tidak diwajibkan melakukan proses registrasi atau login untuk menggunakan sistem, pelanggan tetap direpresentasikan melalui kelas User guna merekam identitas sesi kunjungan (id_session_guest) dan nama pelanggan. Data ini diperlukan untuk mengikat riwayat pesanan dengan pengunjung secara spesifik. Sementara itu, pengelolaan operasional sistem ditangani oleh kelas Admin dan Kasir yang membutuhkan proses autentikasi (login). Kelas-kelas tersebut pada dasarnya merepresentasikan entitas model yang akan diimplementasikan ke dalam struktur tabel pada basis data MySQL.
+ 
+Gambar 3. 6 Class Diagram.
+E.	Perancangan Basis Data
+Perancangan basis data dilakukan untuk mendukung proses penyimpanan, pengelolaan, dan pengambilan data pada sistem informasi kasir berbasis web yang dikembangkan di Angkringan S1. Basis data pada sistem ini dirancang menggunakan sistem manajemen basis data relasional (RDBMS) MySQL. Pemilihan MySQL didasarkan pada kemampuannya dalam menangani relasi antar-tabel secara efisien, yang sangat krusial untuk memastikan integritas data transaksi dan pembaruan stok secara real-time. Basis data ini berfungsi sebagai pusat penyimpanan seluruh informasi operasional sistem, mulai dari kredensial login admin, data sesi pelanggan (user), pengelompokan menu, ketersediaan stok, rekapitulasi pesanan, hingga data respons pembayaran dari integrasi API Payment Gateway (Midtrans).
+Secara terstruktur, relasi antar-tabel dirancang untuk memastikan konsistensi alur kerja operasional. Ketika sebuah transaksi baru masuk, data akan tersimpan dengan status awal Pending, beserta rincian pesanannya. Apabila pembayaran telah divalidasi baik dikonfirmasi manual oleh admin untuk metode cash, maupun melalui callback Midtrans untuk metode digital dan status transaksi berubah menjadi Paid, sistem akan langsung merujuk pada tabel rincian untuk mengetahui jumlah pesanan, lalu secara otomatis mengurangi nilai stok menu terkait. Sebaliknya, jika status berubah menjadi Cancelled, pembaruan pengurangan stok tidak akan dieksekusi.
+Berdasarkan Class Diagram yang telah dirancang, struktur basis data diimplementasikan ke dalam enam tabel utama. Berikut adalah rincian spesifikasi (kamus data) dari masing-masing tabel tersebut:
+1.	Tabel Admin
+Tabel ini digunakan untuk menyimpan data pengguna yang memiliki hak akses tingkat manajerial, memuat username dan password yang dienkripsi untuk keperluan autentikasi (login). 
+
+
+
+Tabel 3. 3 Admin.
+Nama Field	Tipe Data	Panjang	Keterangan
+id_admin	INT	11	Primary Key, Auto Increment
+username	VARCHAR	50	Nama pengguna untuk login
+password	VARCHAR	255	Kata sandi (terenkripsi)
+nama_lengkap	VARCHAR	100	Nama lengkap admin
+2.	Tabel Kasir 
+Tabel ini digunakan untuk menyimpan data pengguna yang memiliki hak akses operasional (kasir) untuk melayani transaksi dan mengonfirmasi pembayaran. 
+Tabel 3. 4 Kasir.
+Nama Field	Tipe Data	Panjang	Keterangan
+id_kasir	INT	11	Primary Key, Auto Increment
+username	VARCHAR	50	Nama pengguna untuk login
+password	VARCHAR	255	Kata sandi (terenkripsi)
+nama_lengkap	VARCHAR	100	Nama lengkap kasir
+3.	Tabel User (Pelanggan) 
+Tabel ini merepresentasikan entitas pelanggan (guest). Sistem menyimpan nama input dan ID sesi (session) saat pelanggan melakukan pemesanan agar aktivitas transaksinya dapat saling terhubung meskipun tanpa login. 
+Tabel 3. 5 User (Pelanggan).
+Nama Field	Tipe Data	Panjang	Keterangan
+id_session_guest	VARCHAR	255	Primary Key, Kode unik sesi pengunjung dari browser
+nama_input	VARCHAR	100	Nama pelanggan yang diinput saat pesan
+4.	Tabel Kategori 
+Tabel ini berfungsi sebagai data referensi jenis atau kelompok menu (misalnya: makanan berat, makanan ringan, minuman) untuk memudahkan pengorganisasian data produk. 
+Tabel 3. 6 Kategori.
+Nama Field	Tipe Data	Panjang	Keterangan
+id_kategori	INT	11	Primary Key, Auto Increment
+nama_kategori	VARCHAR	50	Nama kategori menu
+5.	Tabel Menu 
+Tabel ini digunakan untuk menyimpan rincian produk yang dijual. Kolom stok pada tabel ini menjadi acuan utama sistem untuk memvalidasi apakah suatu pesanan dapat di-checkout oleh pelanggan atau tidak. 
+Tabel 3. 7 Menu.
+Nama Field	Tipe Data	Panjang	Keterangan
+id_menu	INT	11	Primary Key, Auto Increment
+id_kategori	INT	11	Foreign Key (Relasi ke Tabel Kategori)
+nama_menu	VARCHAR	100	Nama produk/menu
+harga	INT	11	Harga jual produk
+stok	INT	11	Sisa ketersediaan barang
+gambar_menu	VARCHAR	255	Direktori/URL gambar produk
+6.	Tabel Transaksi 
+Merupakan tabel sentral yang merekam data pesanan secara umum, termasuk pencatatan nama pelanggan, total tagihan, metode pembayaran, serta token dari Midtrans. 
+
+
+Tabel 3. 8 Transaksi.
+Nama Field	Tipe Data	Panjang	Keterangan
+id_transaksi	INT	11	Primary Key, Auto Increment
+nama_pelanggan	VARCHAR	100	Nama pelanggan yang melakukan transaksi
+waktu_transaksi	DATETIME	-	Waktu pesanan dibuat
+total_harga	INT	11	Total nilai tagihan
+metode_pembayaran	VARCHAR	50	Cash atau Digital
+status_transaksi	ENUM	-	Nilai: Pending, Paid, Cancelled
+snap_token	VARCHAR	255	Kode token dari API Midtrans
+7.	Tabel Detail_Transaksi
+Tabel ini merupakan tabel pivot (relasi penghubung) yang menjembatani tabel Transaksi dan tabel Menu untuk menyimpan rincian spesifik dari setiap item yang dibeli dalam satu struk pesanan. 
+Tabel 3. 9 Detail Transaksi.
+Nama Field	Tipe Data	Panjang	Keterangan
+id_detail	INT	11	Primary Key, Auto Increment
+id_transaksi	INT	11	Foreign Key (Relasi ke Tabel Transaksi)
+id_menu	INT	11	Foreign Key (Relasi ke Tabel Menu)
+jumlah_pesanan	INT	11	Quantity (jumlah barang dibeli)
+subtotal	INT	11	Hasil dari (harga x jumlah_pesanan)
+8.	Tabel Laporan 
+Tabel ini digunakan untuk menyimpan rekapitulasi data penjualan berdasarkan periode waktu tertentu untuk memudahkan pemantauan pendapatan. 
+
+Tabel 3. 10 Laporan.
+Nama Field	Tipe Data	Panjang	Keterangan
+id_laporan	INT	11	Primary Key, Auto Increment
+periode_awal	DATE	-	Tanggal awal rekapitulasi
+periode_akhir	DATE	-	Tanggal akhir rekapitulasi
+total_pendapatan	INT	11	Jumlah pendapatan pada periode tersebut
+jumlah_transaksi	INT	11	Total transaksi yang terjadi
+
+F.	Perancangan Antarmuka Pengguna (UI) 
+Perancangan antarmuka pengguna (User Interface/UI) dilakukan untuk menghasilkan tampilan sistem informasi kasir berbasis web yang responsif, intuitif, dan mampu mendukung proses transaksi secara efisien di Angkringan S1. Perancangan antarmuka pada sistem ini menggunakan konsep responsive web design dengan framework Tailwind CSS, sehingga tata letak komponen akan beradaptasi secara proporsional saat diakses melalui layar komputer (oleh kasir) maupun layar smartphone (oleh pelanggan).
+Desain antarmuka dibagi menjadi dua ranah utama: sisi User (pelanggan) yang dirancang sesederhana mungkin agar pemesanan mandiri (self-ordering) dapat dilakukan tanpa kebingungan, dan sisi Admin (kasir) yang dirancang informatif untuk memudahkan pemantauan dan pengelolaan transaksi.
+Berikut adalah rincian perancangan halaman antarmuka pengguna:
+1.	Halaman Login 
+Halaman ini merupakan pintu masuk keamanan bagi pengelola sistem. Hanya admin (kasir) yang dapat mengakses halaman ini untuk melakukan autentikasi sebelum diarahkan ke dashboard utama.
+ 
+Gambar 3. 7 Halaman Login.
+Komponen: Logo/Nama Angkringan, Form Username, Form Password, dan Tombol Login.
+2.	Halaman Dashboard Admin
+Halaman dashboard merupakan pusat kendali admin yang menampilkan ringkasan data dan transaksi masuk secara real-time. Pada halaman ini, admin dapat melihat pesanan yang berstatus Pending dan melakukan konfirmasi jika metode pembayarannya adalah cash, atau membatalkannya (Cancelled).
+ 
+Gambar 3. 8 Halaman Dashboard Admin.
+Komponen: Menu Navigasi (Kelola Menu, Riwayat, Laporan), Ringkasan Penjualan, Tabel Transaksi Masuk (Real-time), Tombol Aksi (Konfirmasi Cash, Batalkan, Cetak Struk).
+3.	Halaman Daftar Menu User
+Halaman ini adalah halaman utama yang langsung dilihat oleh pelanggan saat mengakses web. Pelanggan dapat menelusuri menu, melihat harga, mengecek sisa stok, dan memasukkan menu ke dalam keranjang pesanan.
+ 
+Gambar 3. 9 Halaman Daftar Menu User.
+Komponen: Daftar Kategori, Card Menu (Gambar, Nama, Harga, Sisa Stok), Tombol Tambah ke Keranjang, dan Ikon Keranjang Belanja melayang (floating).
+4.	Halaman Checkout Transaksi
+Halaman ini menampilkan rincian pesanan yang telah dipilih oleh pelanggan, kalkulasi total harga, dan pemilihan metode pembayaran sebelum pesanan dikirim ke sistem admin.
+ 
+Gambar 3. 10 Halaman Checkout Transaksi.
+Komponen: Daftar Item Keranjang, Rincian Harga, Form Nama Pelanggan, Opsi Metode Pembayaran (Cash / Digital), dan Tombol Checkout.
+5.	Halaman Pembayaran Digital
+Halaman ini muncul secara spesifik apabila pelanggan memilih metode pembayaran digital pada saat checkout. Halaman ini menampilkan antarmuka Snap Midtrans atau kode QR yang harus dipindai oleh pelanggan.
+ 
+Gambar 3. 11 Halaman Pembayaran Digital.
+Komponen: Instruksi Pembayaran, Rincian Total, Widget/Popup Midtrans (QR Code), Batas Waktu Pembayaran, dan Tombol Batal.
+6.	Halaman Status Transaksi
+Halaman ini berfungsi sebagai layar konfirmasi bagi pelanggan untuk melihat apakah pembayarannya (baik secara digital maupun tunai) telah berhasil divalidasi oleh sistem/admin atau belum.
+ 
+Gambar 3. 12 Halaman Status Transaksi.
+Komponen: Nomor Pesanan, Animasi/Ikon Status (Pending / Paid / Cancelled), Detail Ringkasan, dan Tombol Kembali ke Menu.
+7.	Halaman Riwayat Transaksi
+Halaman ini merupakan fasilitas khusus admin untuk meninjau data historis seluruh transaksi yang telah terjadi di Angkringan S1. Dari halaman ini admin juga dapat melakukan pencetakan ulang struk PDF.
+ 
+Gambar 3. 13 Halaman Riwayat Transaksi.
+Komponen: Filter Tanggal, Search Bar, Tabel Riwayat Transaksi (Status Paid dan Cancelled), dan Tombol Unduh Laporan/Struk.
+3.5.4 Implementasi Sistem 
+Tahap implementasi sistem merupakan proses penerjemahan hasil analisis kebutuhan dan perancangan sistem (diagram UML dan basis data) ke dalam bentuk baris kode program (source code) sehingga menghasilkan perangkat lunak yang dapat dijalankan. Pada tahap ini, sistem informasi kasir di Angkringan S1 dibangun menggunakan bahasa pemrograman PHP versi 8.1 dengan framework Laravel 12 sebagai struktur backend, MySQL sebagai sistem manajemen basis data, serta framework Tailwind CSS untuk membangun antarmuka (frontend) yang responsif. 
+Proses implementasi pada penelitian ini dibagi menjadi beberapa bagian utama agar pengembangan berjalan secara terstruktur:
+A.	Implementasi Basis Data (MySQL) 
+Implementasi basis data dilakukan dengan membuat tabel-tabel menggunakan fitur migration pada Laravel. Tabel yang dibuat meliputi tabel admin, kasir, user, kategori, menu, transaksi, detail transaksi, dan laporan. Pada tahap ini juga diimplementasikan relasi antar tabel (foreign key) serta pembatasan nilai (enum) pada kolom status transaksi yang hanya menerima nilai Pending, Paid, atau Cancelled.
+B.	Implementasi Antarmuka Pengguna (Frontend) 
+Implementasi antarmuka dipisahkan menjadi dua lingkungan akses utama menggunakan routing Laravel dan tata letak dari Tailwind CSS, yang disesuaikan dengan penggunaan dua perangkat di lokasi:
+1.	Antarmuka User (Pelanggan): Diimplementasikan sebagai halaman publik tanpa autentikasi (login) yang dijalankan pada perangkat khusus yang menghadap pelanggan (customer-facing display). Halaman ini difokuskan pada fungsionalitas pemesanan interaktif secara mandiri, menampilkan katalog menu, pengecekan sisa stok secara real-time, keranjang belanja, hingga proses checkout dan pemilihan metode pembayaran.
+2.	Antarmuka Admin dan Kasir: Diimplementasikan sebagai halaman dashboard tertutup yang mewajibkan proses login dan dioperasikan pada perangkat utama di meja kasir. Halaman ini memfasilitasi pengguna dengan hak akses 'Kasir' untuk memantau transaksi masuk dan memvalidasi pembayaran tunai, serta memfasilitasi hak akses 'Admin' untuk mengelola data menu dan kategori, menyesuaikan ketersediaan stok, hingga melihat rekapitulasi laporan penjualan.
+
+C.	Implementasi Logika Bisnis (Backend) dan Pemrosesan Transaksi 
+Bagian ini diimplementasikan menggunakan Controller pada Laravel untuk mengatur logika pemrosesan data. Beberapa logika utama yang dibangun meliputi:
+1.	Validasi Stok: Sistem diprogram untuk selalu mengecek ketersediaan stok sebelum pelanggan diizinkan menekan tombol checkout.
+2.	Alur Pembayaran Tunai (Cash): Logika diprogram agar transaksi tunai yang baru masuk langsung berstatus Pending. Kasir diberikan tombol aksi pada dashboard untuk memvalidasi pembayaran. Ketika ditekan, controller akan mengubah status menjadi Paid dan secara otomatis menjalankan fungsi pengurangan stok menu di database.
+3.	Pembatalan Transaksi: Logika untuk mengubah status menjadi Cancelled jika transaksi yang masih Pending dibatalkan oleh pelanggan atau pihak kasir, tanpa mengeksekusi pengurangan stok.
+D.	Implementasi Integrasi Payment Gateway (Midtrans API) 
+Pemilihan Midtrans sebagai payment gateway dalam sistem ini didasari oleh beberapa keunggulan utama. Pertama, Midtrans menyediakan dokumentasi yang komprehensif dan sangat mudah diintegrasikan dengan framework Laravel. Kedua, platform ini mendukung berbagai metode pembayaran yang relevan dengan tren transaksi digital saat ini, khususnya QRIS dan dompet digital (e-wallet). Ketiga, adanya fitur Midtrans Snap memungkinkan sistem untuk menampilkan antarmuka pembayaran yang responsif dan siap pakai, sehingga mempercepat proses pengembangan tanpa harus merancang User Interface (UI) pembayaran dari awal.
+Secara teknis, implementasi ini dilakukan dengan menghubungkan backend Laravel ke server Midtrans menggunakan API Keys (kunci autentikasi rahasia). Ketika pelanggan memilih opsi pembayaran digital, sistem akan mengirimkan request ke Midtrans untuk menghasilkan Snap Token. Token inilah yang akan memicu munculnya jendela pembayaran atau barcode QRIS secara langsung di layar perangkat pelanggan.
+Untuk memastikan sinkronisasi data yang real-time, sistem juga mengimplementasikan fungsi Webhook atau HTTP Callback. Fungsi ini bertugas "mendengarkan" respons atau update status dari Midtrans secara asinkron (asynchronous). Apabila Midtrans mengirimkan notifikasi bahwa pembayaran telah berhasil diselesaikan oleh pelanggan, sistem akan meresponsnya dengan memperbarui status transaksi menjadi 'Paid' (Lunas) dan langsung mengurangi stok menu secara otomatis. Otomatisasi keamanan dan validasi ini membuat proses transaksi menjadi lebih akurat dan efisien, karena tidak lagi memerlukan konfirmasi atau klik manual dari pihak kasir.
+E.	Implementasi Laporan dan Struk PDF 
+Pada tahap akhir, diimplementasikan sebuah library khusus pada Laravel untuk merender data transaksi yang berstatus Paid ke dalam format dokumen PDF. Fitur ini memungkinkan kasir untuk mencetak struk fisik bagi pelanggan atau mengunduh laporan penjualan harian dan bulanan secara terkomputerisasi.
+3.5.5 Pengujian Sistem 
+Tahap pengujian sistem dilakukan untuk memastikan bahwa perangkat lunak yang telah dibangun terbebas dari kesalahan (bug) dan seluruh fungsionalitasnya berjalan dengan baik sesuai dengan spesifikasi kebutuhan yang telah dirancang. Pengujian berfokus pada interaksi pengguna (baik pelanggan maupun admin) terhadap antarmuka web, pemrosesan alur transaksi, pembaruan status basis data, serta integrasi dengan API pihak ketiga.
+Pada penelitian ini, evaluasi sistem sepenuhnya menggunakan metode pengujian fungsional, yaitu Black Box Testing. Black Box Testing merupakan metode pengujian perangkat lunak yang berfokus pada sisi fungsionalitas sistem berdasarkan input yang diberikan dan output yang dihasilkan, tanpa perlu melihat atau mengetahui struktur kode program (source code) internalnya. Pengujian ini bertujuan untuk memvalidasi apakah setiap fitur yang ada di antarmuka pelanggan dan dashboard admin memberikan respons yang tepat sesuai dengan alur logika sistem yang diharapkan.
+Pengujian pada sistem informasi kasir Angkringan S1 mencakup skenario utama seperti autentikasi admin, pengelolaan data dan ketersediaan stok menu, validasi keranjang belanja pelanggan, pemrosesan transaksi tunai (cash), integrasi respons dari Payment Gateway (Midtrans), pembatalan pesanan, serta pencetakan struk laporan. Hasil pengujian dinyatakan berhasil apabila sistem mampu menghasilkan output yang selaras dengan skenario perancangan.
+Adapun rincian skenario pengujian yang dilakukan pada sistem ini dapat dilihat pada Tabel 3.3.
+Tabel 3. 11 Pengujian Sistem (Black Box Testing).
+No	Fitur yang Diuji	Skenario Pengujian (Input/Aksi)	Hasil yang Diharapkan (Output)
+1	Login Admin	Admin memasukkan username dan password yang valid.	Sistem memvalidasi kredensial dan mengarahkan admin ke halaman dashboard.
+2	Kelola Menu & Stok	Admin menambah menu baru atau menyesuaikan angka stok secara manual.	Data menu dan jumlah stok terbaru berhasil tersimpan dan tampil di basis data serta halaman pelanggan.
+3	Validasi Stok (Pelanggan)	Pelanggan mencoba checkout pesanan dengan jumlah melebihi sisa stok menu.	Sistem memunculkan peringatan error dan menonaktifkan tombol checkout (pesanan ditolak).
+4	Checkout Pesanan	Pelanggan memilih menu dan masuk ke halaman keranjang belanja.	Sistem berhasil menghitung dan menampilkan total tagihan pembayaran secara akurat.
+5	Pembayaran Tunai (Cash)	Pelanggan melakukan checkout dan memilih metode pembayaran cash.	Transaksi tersimpan ke database dengan status awal Pending dan langsung muncul di layar dashboard admin.
+6	Konfirmasi Cash (Admin)	Admin menekan tombol konfirmasi pembayaran cash pada transaksi yang berstatus Pending.	Status transaksi berubah menjadi Paid, dan sistem secara otomatis mengurangi jumlah stok menu.
+7	Pembayaran Digital	Pelanggan melakukan checkout dan memilih metode pembayaran digital.	Sistem menampilkan popup/QR Code dari Midtrans dan status transaksi di database adalah Pending.
+8	Callback Payment Gateway	Pelanggan berhasil mentransfer dana melalui dompet digital/QRIS ke Midtrans.	Sistem menerima callback keberhasilan, otomatis mengubah status menjadi Paid, dan stok menu berkurang.
+9	Pembatalan Transaksi	Pelanggan atau admin menekan tombol batal pada transaksi yang masih berstatus Pending.	Status transaksi berubah menjadi Cancelled dan sistem tidak mengurangi jumlah stok menu.
+10	Cetak Struk / Laporan	Admin menekan tombol cetak pada transaksi yang telah berstatus Paid.	Sistem mengunduh/menampilkan dokumen struk pembelian dalam format PDF.
+
+3.6 Jadwal Penelitian
+Jadwal penelitian ini direncanakan berlangsung selama lima bulan, dimulai dari bulan Mei hingga September 2026, yang mencakup tahap persiapan, pengumpulan data, analisis, hingga penyusunan laporan.
+Tabel 3. 12 Jadwal Penelitian.
+No	Kegiatan	Mei	Juni	Juli	Agustus	September
+		1	2	3	4	1	2	3	4	1	2	3	4	1	2	3	4	1	2	3	4
+1	Persiapan Penelitian		 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Observasi & Identifikasi	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Penyusunan Proposal	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Seminar Proposal 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+2	Pelaksanaan Penelitian	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Izin & Pengumpulan Data	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Pembuatan Sistem Kasir	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Pengujian Sistem	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+3	Tahap Akhir	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Penyusunan Laporan Skripsi	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+ 	Sidang Akhir	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 
+  
+DAFTAR PUSTAKA
+
+[1]	M. R. Ridho, “Rancang Bangun Sistem Informasi Point Of Sale Dengan Framework Codeigniter Pada Cv Powershop,” Vol. 04, No. 02, 2021.
+[2]	N. Nestary, “Perancangan Sistem Informasi Penjualan Pada Toko Stock Point Lily Berbasis Php Mysql,” Jikb.Jur.Il.Kom.Bis, Vol. 11, No. 1, Pp. 2320–2337, Oct. 2020, Doi: 10.47927/Jikb.V11i1.195.
+[3]	C. D. Akbartio, D. Setiawan, And Z. Abidin, “Sistem Informasi Layanan Teknologi Informatika Dan Komunikasi Berbasis Web,” Informasi (Jurnal Informatika Dan Sistem Informasi), Vol. 17, No. 2, Pp. 265–280, Nov. 2025, Doi: 10.37424/Informasi.V17i2.446.
+[4]	S. Susmiyanto And G. Z. Muflih, “Pengembangan Sistem Informasi Penjualan Menggunakan Model Rapid Application Development (Rad) Di Toko Anto Kaibon,” Jurnal Kridatama Sains Dan Teknologi, Vol. 7, No. 01, Pp. 233–243, Jun. 2025, Doi: 10.53863/Kst.V7i01.1594.
+[5]	A. Saputra, C. F. I. Safitri, F. Fitriyani, Y. Gulo, And T. Desyani, “Pengembangan Aplikasi Kasir Menggunakan Model Waterfall,” Jtsia, Vol. 4, No. 2, P. 86, Apr. 2021, Doi: 10.32493/Jtsi.V4i2.10167.
+[6]	A. Pakaya, R. Sulaehani, And I. Muzakkir, “Perancangan Sistem Informasi Kasir Penjualan Pada Toko Rahyun Indah,” 2023.
+[7]	M. F. Nuha And B. Nurdewanto, “Digitalisasi Transaksi Umkm Melalui Sistem Point Of Sale Berbasis Web,” Journal Of Information System And Application Development, Vol. 4, No. 1, Pp. 161–168, Mar. 2026, Doi: 10.26905/Jisad.V4i1.16919.
+[8]	I. K. Kumaini, M. Mutamassikin, And A. Triadi, “Rancang Bangun Sistem Informasi Point Of Sales Berbasis Web Pada Toko Sembako Putri,” Jurnal Komputer Teknologi Informasi Sistem Komputer (Juktisi), Vol. 4, No. 2, Pp. 1104–1112, Sep. 2025, Doi: 10.62712/Juktisi.V4i2.596.
+[9]	A. Sudianto, B. A. C. Permana, Muhammad Wasil, And Harianto, “Penerapan Sistem Payment Gateway Pada E-Commerce Sebagai Upaya Peningkatan Penjualan,” Infotek, Vol. 8, No. 1, Pp. 271–279, Jan. 2025, Doi: 10.29408/Jit.V8i1.28323.
+[10]	M. Nurhayati And R. Setiawan, “Implementasi Payment Gateway Midtrans Pada Aplikasi Toko Mas Berbasis Web,” Jurnal Algoritma, Vol. 21, No. 2, Pp. 366–377, Nov. 2024, Doi: 10.33364/Algoritma/V.21-2.1686.
+[11]	S. E. T. Sami, S. Rahmawati, A. Prasetyo, And C. Cahyono, “Aplikasi Sistem Informasi Penjualan Pada Rumah Makan ‘Jeng Tin’ Menggunakan Database Mysql,” J. Janitra Inform. Sis. Inf., Vol. 4, No. 1, Pp. 1–14, Jun. 2024, Doi: 10.59395/Janitra.V4i1.178.
+[12]	M. Haries, “Sistem Informasi Arsip Dokumen Berbasis Php Mysql Pada Kantor Camat Nisam Antara,” Fahma, Vol. 22, No. 1, Pp. 10–17, Jan. 2024, Doi: 10.61805/Fahma.V22i1.107.
+[13]	Y. Aulia, M. A. Faris, And M. S. O. Attawuwur, “Penerapan Check-In Online Berbasis Web Dengan Framework (Studi Kasus Bandara Frans Kaisiepo Biak),” Sudo J. Teknik Inform., Vol. 4, No. 2, Pp. 75–82, Jun. 2025, Doi: 10.56211/Sudo.V4i2.830.
+[14]	S. Azhariyah And Muhammad Mukhlis, “Framework Css: Tailwind Css Untuk Front-End Website Store Pt. Xyz,” Ji, Vol. 3, No. 1, Pp. 30–36, Apr. 2024, Doi: 10.57094/Ji.V3i1.1601.
+[15]	M. N. Nasution And R. Maulana, “Pengembangan Aplikasi Sistem Informasi Akademik Berbasis Web Menggunakan Framework Laravel: Studi Kasus Di Smk Assalam Depok,” J. Inform. Terpadu, Vol. 10, No. 2, Pp. 156–164, Oct. 2024, Doi: 10.54914/Jit.V10i2.1436.
+[16]	L. Rahmawati And S. Sumarsono, “Desain Pengembangan Website Dengan Arsitektur Model View Controller Pada Framework Laravel,” Jteksis, Vol. 6, No. 4, Pp. 785–790, Oct. 2024, Doi: 10.47233/Jteksis.V6i4.1497.
+[17]	H. Haviluddin, “Memahami Penggunaan Uml (Unified Modelling Language),” Informatika Mulawarman : Jurnal Ilmiah Ilmu Komputer, Vol. 6, No. 1, Pp. 1–15, Jun. 2016, Doi: 10.30872/Jim.V6i1.16.
+[18]	K. Nistrina And L. Sahidah, “Unified Modelling Language (Uml) Untuk Perancangan Sistem Informasi Penerimaan Siswa Baru Di Smk Marga Insan Kamil,” Jurnal Sistem Informasi, Vol. 04, 2022.
+[19]	W. Gilliani, Errissya Rasywir, And Lazuardi Yudha Pradana, “Perancangan Sistem Informasi Pengadaan Barang Berbasis Web (Studi Kasus : Cv. Royal Transindo),” Jmsunama, Vol. 4, No. 1, Pp. 657–666, Apr. 2024, Doi: 10.33998/Jms.2024.4.1.1679.
+[20]	Rizka Hafsari, Edo Arribe, M. L. Andria, And V. Miransya, “Perancangan Sistem Informasi Penjualan Menggunakan Metode Waterfall (Studi Kasus Pt. Riau Pos Intermedia),” Prosisko, Vol. 11, No. 1, Pp. 20–25, Mar. 2024, Doi: 10.30656/Prosisko.V11i1.7794.
+[21]	Rizka Hafsari, Edo Arribe, M. L. Andria, And V. Miransya, “Perancangan Sistem Informasi Penjualan Menggunakan Metode Waterfall (Studi Kasus Pt. Riau Pos Intermedia),” Prosisko, Vol. 11, No. 1, Pp. 20–25, Mar. 2024, Doi: 10.30656/Prosisko.V11i1.7794.
+[22]	D. Ardiansyah, A. Saepudin, R. Aryanti, And E. Fitriani, “Implementasi Sistem Informasi Inventory Barang Di Sekolah Berbasis Website Menggunakan Metode Rapid Application Development,” Vol. 6, No. 1, 2025.
+[23]	Rizka Hafsari, Edo Arribe, M. L. Andria, And V. Miransya, “Perancangan Sistem Informasi Penjualan Menggunakan Metode Waterfall (Studi Kasus Pt. Riau Pos Intermedia),” Prosisko, Vol. 11, No. 1, Pp. 20–25, Mar. 2024, Doi: 10.30656/Prosisko.V11i1.7794.
+[24]	Ragil Priyambodo, Muhammad Arifin, And Yudie Irawan, “Perancangan Sistem Informasi Penjualan Berbasis Web Menggunakan Metode Unifield  Modelling Language (Uml),” Sitech, Aug. 2024, Accessed: May 20, 2026. [Online]. Available: Http://Www.Jurnal.Umk.Ac.Id/Sitech
+[25]	S. W. Ramdany, S. A. Kaidar, B. Aguchino, C. A. A. Putri, And R. Anggie, “Penerapan Uml Class Diagram Dalam Perancangan Sistem Informasi Perpustakaan Berbasis Web,” 2024.
+[26]	A. Aurellia, “Pemanfaatan Uml Dalam Perancangan Sistem Informasi Produk Kreatif Daur Ulang Sampah Berbasis Web,” Jitet, Vol. 13, No. 3s1, Oct. 2025, Doi: 10.23960/Jitet.V13i3s1.8073.
+[27]	M. Zen, Irwan, Hafni, And M. D. P. Ananda, “Implementasi Dan Pengujian Menggunakan Metode Blackbox Testing Pada Sistem Informasi Tracer Study,” Bulletincsr, Vol. 4, No. 4, Pp. 327–340, Jun. 2024, Doi: 10.47065/Bulletincsr.V4i4.359.
+[28]	A. Jailani And M. A. Yaqin, “Pengujian Aplikasi Sistem Informasi Akademik Menggunakan Metode Blackbox Dengan Teknik Boundary Value Analysis,” Jacis, Vol. 4, No. 2, Pp. 60–66, Jul. 2024, Doi: 10.47134/Jacis.V4i2.78.
+[29]	B. Fachri And C. Rizal, “Penerapan Metode Waterfall Dalam Perancangan Sistem Informasi Merdeka Belajar Kampus Merdeka Berbasis Web,” Vol. 2, No. 3, 2024.
+[30]	Imam Mualim, Nuari Anisa Sivi, Risti Ayuni, And Rudi Hartono, “Rancang Bangun Sistem Penggajian Dosen Penguji Seminar Proposal Dan Ujian Skripsi Berbasis Web Pada Fakultas Sains Dan Teknologi Universitas Nahdlatul Ulama Lampung,” Explorit, Vol. 15, No. 1, Pp. 22–29, Jun. 2023, Doi: 10.35891/Explorit.V15i1.3966.
+[31]	Anas Turmudzi And Made Kamisutara, “Perancangan Dan Implementasi Marketplace Dengan Sistem Mini Pos Terintegrasi Untuk Usaha Digital Printing,” Jemsi, Vol. 6, No. 3, Pp. 1942–1963, Feb. 2025, Doi: 10.38035/Jemsi.V6i3.4339.
+[32]	M. Khadafi, “Rancang Bangun Sistem Penjualan E-Commerce Berbasis Website Menggunakan Framework Laravel Studi Kasus : Toko Sridafi”.
+[33]	F. A. M. Andy And S. Widiono, “Inovasi Teknologi Dalam Manajemen Penjualan: Aplikasi Point Of Sales Berbasis Web Untuk Umkm,” Infomatek, Vol. 26, No. 2, Pp. 161–174, Nov. 2024, Doi: 10.23969/Infomatek.V26i2.19007.
+[34]	I. D. Prayudha, M. A. Irwansyah, And H. Anra, “Rancang Bangun Aplikasi Point Of Sale (Pos App) Berbasis Progressive Web App Untuk Usaha Mikro Kecil Dan Menengah,” Justin, Vol. 12, No. 2, P. 330, Apr. 2024, Doi: 10.26418/Justin.V12i2.76824.
+[35]	Rayhan Achmad And Malabay, “Aplikasi Web Laravel Untuk Pemesanan Dan Manajemen Produk Umkm,” Ikraith-Informatika, Vol. 9, No. 3, Doi: Https://Doi.Org/10.37817/Ikraith-Informatika.V9i3.
+

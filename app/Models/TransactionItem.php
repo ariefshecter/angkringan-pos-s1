@@ -10,12 +10,15 @@ class TransactionItem extends Model
 {
     use HasFactory;
 
+    protected $table = 'detail_transaksi';
+
     protected $fillable = [
         'transaction_id',
         'menu_id',
         'menu_name',
         'price',
         'quantity',
+        'reserved_quantity',
         'subtotal',
     ];
 
@@ -24,6 +27,7 @@ class TransactionItem extends Model
         return [
             'price' => 'integer',
             'quantity' => 'integer',
+            'reserved_quantity' => 'integer',
             'subtotal' => 'integer',
         ];
     }

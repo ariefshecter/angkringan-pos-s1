@@ -23,7 +23,7 @@ class MidtransService
         $transaction->loadMissing('items');
         $params = [
             'transaction_details' => [
-                'order_id' => $transaction->order_number,
+                'order_id' => $transaction->gatewayOrderId(),
                 'gross_amount' => $transaction->total,
             ],
             'enabled_payments' => $this->enabledPaymentsFor($transaction),
@@ -80,7 +80,7 @@ class MidtransService
         $response = CoreApi::charge([
             'payment_type' => 'bank_transfer',
             'transaction_details' => [
-                'order_id' => $transaction->order_number,
+                'order_id' => $transaction->gatewayOrderId(),
                 'gross_amount' => $transaction->total,
             ],
             'bank_transfer' => [
@@ -121,6 +121,12 @@ class MidtransService
 
     public function cancelTransaction(Transaction $transaction): void
     {
+        if (! $transaction->midtrans_order_id
+            && ! $transaction->midtrans_transaction_id
+            && ! $transaction->midtrans_snap_token) {
+            return;
+        }
+
         $this->configure();
 
         if (! config('services.midtrans.server_key')) {
@@ -128,7 +134,7 @@ class MidtransService
         }
 
         try {
-            $statusCode = MidtransTransaction::cancel($transaction->order_number);
+            $statusCode = MidtransTransaction::cancel($transaction->gatewayOrderId());
         } catch (Throwable $exception) {
             // Token Snap dapat gagal sebelum transaksi terbentuk di Midtrans.
             if ((int) $exception->getCode() === 404) {

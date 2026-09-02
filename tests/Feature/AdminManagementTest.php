@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\Category;
+use App\Models\Customer;
+use App\Models\Kasir;
 use App\Models\Menu;
 use App\Models\Transaction;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +19,7 @@ class AdminManagementTest extends TestCase
 
     public function test_admin_can_manage_categories(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
 
         $this->activateDevice()->actingAs($admin)->post(route('admin.categories.store'), [
             'name' => 'Paket Hemat',
@@ -32,12 +34,12 @@ class AdminManagementTest extends TestCase
             'is_active' => 1,
         ])->assertRedirect(route('admin.categories.index'));
 
-        $this->assertDatabaseHas('categories', ['slug' => 'paket-spesial']);
+        $this->assertDatabaseHas('kategori', ['slug' => 'paket-spesial']);
     }
 
     public function test_category_status_reflects_orderable_menu_stock(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
         $category = Category::query()->create([
             'name' => 'Camilan',
             'slug' => 'camilan',
@@ -77,7 +79,7 @@ class AdminManagementTest extends TestCase
     public function test_admin_can_create_menu_with_image(): void
     {
         Storage::fake('public');
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
         $category = Category::query()->create(['name' => 'Makanan', 'slug' => 'makanan']);
 
         $this->activateDevice()->actingAs($admin)->post(route('admin.menus.store'), [
@@ -96,15 +98,16 @@ class AdminManagementTest extends TestCase
 
     public function test_cashier_can_not_access_admin_management(): void
     {
-        $cashier = User::factory()->create(['role' => 'cashier']);
+        $cashier = Kasir::factory()->create();
 
-        $this->activateDevice()->actingAs($cashier)->get(route('admin.categories.index'))->assertForbidden();
-        $this->actingAs($cashier)->get(route('admin.menus.index'))->assertForbidden();
+        $this->activateDevice()->actingAs($cashier, 'kasir')->withSession(['staff_guard' => 'kasir'])
+            ->get(route('admin.categories.index'))->assertForbidden();
+        $this->get(route('admin.menus.index'))->assertForbidden();
     }
 
     public function test_admin_can_not_reduce_stock_below_active_reservations(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
         $category = Category::query()->create(['name' => 'Makanan', 'slug' => 'makanan']);
         $menu = Menu::query()->create([
             'category_id' => $category->id,
@@ -132,7 +135,7 @@ class AdminManagementTest extends TestCase
 
     public function test_menu_with_zero_available_stock_is_shown_as_unavailable(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
         $category = Category::query()->create(['name' => 'Makanan', 'slug' => 'makanan']);
         Menu::query()->create([
             'category_id' => $category->id,
@@ -153,9 +156,14 @@ class AdminManagementTest extends TestCase
 
     public function test_admin_transaction_pages_have_automatic_live_regions(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
+        $customer = Customer::query()->create([
+            'session_id' => 'dashboard-customer',
+            'name' => 'Pelanggan Live',
+        ]);
         Transaction::query()->create([
             'order_number' => 'S1-LIVE-DASHBOARD',
+            'user_session_id' => $customer->session_id,
             'customer_name' => 'Pelanggan Live',
             'subtotal' => 10000,
             'total' => 10000,

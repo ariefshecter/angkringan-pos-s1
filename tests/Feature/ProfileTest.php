@@ -2,7 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Admin;
+use App\Models\Kasir;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -10,95 +11,58 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_profile_page_is_displayed(): void
+    public function test_admin_profile_page_is_displayed_without_account_deletion(): void
     {
-        $user = User::factory()->create();
+        $admin = Admin::factory()->create();
 
-        $response = $this
-            ->activateDevice()
-            ->actingAs($user)
-            ->get('/profile');
-
-        $response->assertOk();
+        $this->activateDevice()->actingAs($admin, 'admin')->withSession(['staff_guard' => 'admin'])
+            ->get(route('profile.edit'))
+            ->assertOk()
+            ->assertSee('name="username"', false)
+            ->assertDontSee('Delete Account');
     }
 
-    public function test_profile_information_can_be_updated(): void
+    public function test_kasir_profile_information_can_be_updated(): void
     {
-        $user = User::factory()->create();
+        $kasir = Kasir::factory()->create();
 
-        $response = $this
-            ->activateDevice()
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-            ]);
+        $this->activateDevice()->actingAs($kasir, 'kasir')->withSession(['staff_guard' => 'kasir'])
+            ->patch(route('profile.update'), [
+                'name' => 'Kasir Utama',
+                'username' => 'kasir-utama',
+                'email' => 'kasir.utama@example.com',
+            ])->assertSessionHasNoErrors()->assertRedirect(route('profile.edit'));
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
-
-        $user->refresh();
-
-        $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
+        $kasir->refresh();
+        $this->assertSame('Kasir Utama', $kasir->name);
+        $this->assertSame('kasir-utama', $kasir->username);
+        $this->assertSame('kasir.utama@example.com', $kasir->email);
     }
 
-    public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
+    public function test_username_must_be_unique_across_admin_and_kasir_tables(): void
     {
-        $user = User::factory()->create();
+        $admin = Admin::factory()->create(['username' => 'pemilik']);
+        $kasir = Kasir::factory()->create(['username' => 'kasir-awal']);
 
-        $response = $this
-            ->activateDevice()
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => $user->email,
-            ]);
+        $this->activateDevice()->actingAs($kasir, 'kasir')->withSession(['staff_guard' => 'kasir'])
+            ->from(route('profile.edit'))
+            ->patch(route('profile.update'), [
+                'name' => $kasir->name,
+                'username' => $admin->username,
+                'email' => $kasir->email,
+            ])->assertSessionHasErrors('username')->assertRedirect(route('profile.edit'));
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
-
-        $this->assertNotNull($user->refresh()->email_verified_at);
+        $this->assertSame('kasir-awal', $kasir->refresh()->username);
     }
 
-    public function test_user_can_delete_their_account(): void
+    public function test_profile_deletion_route_is_disabled(): void
     {
-        $user = User::factory()->create();
+        $admin = Admin::factory()->create();
 
-        $response = $this
-            ->activateDevice()
-            ->actingAs($user)
-            ->delete('/profile', [
-                'password' => 'password',
-            ]);
+        $this->activateDevice()->actingAs($admin, 'admin')->withSession(['staff_guard' => 'admin'])
+            ->delete('/profile', ['password' => 'password'])
+            ->assertMethodNotAllowed();
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/');
-
-        $this->assertGuest();
-        $this->assertNull($user->fresh());
-    }
-
-    public function test_correct_password_must_be_provided_to_delete_account(): void
-    {
-        $user = User::factory()->create();
-
-        $response = $this
-            ->activateDevice()
-            ->actingAs($user)
-            ->from('/profile')
-            ->delete('/profile', [
-                'password' => 'wrong-password',
-            ]);
-
-        $response
-            ->assertSessionHasErrorsIn('userDeletion', 'password')
-            ->assertRedirect('/profile');
-
-        $this->assertNotNull($user->fresh());
+        $this->assertNotNull($admin->fresh());
     }
 }

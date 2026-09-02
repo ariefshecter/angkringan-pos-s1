@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use App\Models\Device;
-use App\Models\User;
+use App\Models\Kasir;
 use App\Services\DeviceActivationCode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -15,11 +16,10 @@ class DeviceManagementTest extends TestCase
 
     public function test_admin_can_create_a_device_and_receives_a_single_use_code(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
 
-        $response = $this->activateDevice()->actingAs($admin)->post(route('admin.devices.store'), [
+        $response = $this->actingAs($admin)->post(route('admin.devices.store'), [
             'name' => 'Kiosk Pelanggan 2',
-            'type' => Device::TYPE_KIOSK,
         ]);
 
         $response->assertRedirect(route('admin.devices.index'))
@@ -74,7 +74,7 @@ class DeviceManagementTest extends TestCase
 
     public function test_regenerating_a_code_disconnects_the_previous_device(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = Admin::factory()->create();
         $oldToken = Str::random(80);
         $kiosk = Device::query()->create([
             'name' => 'Kiosk Lama',
@@ -85,7 +85,7 @@ class DeviceManagementTest extends TestCase
             'activated_at' => now(),
         ]);
 
-        $response = $this->activateDevice()->actingAs($admin)
+        $response = $this->actingAs($admin)
             ->post(route('admin.devices.regenerate', $kiosk));
 
         $response->assertRedirect()->assertSessionHas('device_activation');
@@ -96,28 +96,30 @@ class DeviceManagementTest extends TestCase
             ->assertRedirect(route('device.activate'));
     }
 
-    public function test_current_admin_device_can_not_be_disabled_or_reset(): void
+    public function test_admin_can_manage_kiosk_without_device_activation(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
-        $this->activateDevice()->actingAs($admin);
-        $currentDevice = Device::query()->where('type', Device::TYPE_ADMIN)->firstOrFail();
-        $originalTokenHash = $currentDevice->token_hash;
+        $admin = Admin::factory()->create();
+        $kiosk = Device::query()->create([
+            'name' => 'Kiosk Tanpa Device Admin',
+            'type' => Device::TYPE_KIOSK,
+            'activation_code_hash' => hash('sha256', 'KIOSK-LAMA'),
+            'is_active' => true,
+        ]);
 
-        $this->patch(route('admin.devices.toggle', $currentDevice))
-            ->assertSessionHas('error');
-        $this->post(route('admin.devices.regenerate', $currentDevice))
-            ->assertSessionHas('error');
+        $this->actingAs($admin)
+            ->get(route('admin.devices.index'))
+            ->assertOk()
+            ->assertSee('Admin dan Kasir tidak memerlukan aktivasi perangkat');
+        $this->patch(route('admin.devices.toggle', $kiosk))->assertSessionHas('success');
 
-        $currentDevice->refresh();
-        $this->assertTrue($currentDevice->is_active);
-        $this->assertSame($originalTokenHash, $currentDevice->token_hash);
+        $this->assertFalse($kiosk->fresh()->is_active);
     }
 
     public function test_cashier_can_not_manage_devices(): void
     {
-        $cashier = User::factory()->create(['role' => 'cashier']);
+        $cashier = Kasir::factory()->create();
 
-        $this->activateDevice()->actingAs($cashier)
+        $this->activateDevice()->actingAs($cashier, 'kasir')->withSession(['staff_guard' => 'kasir'])
             ->get(route('admin.devices.index'))
             ->assertForbidden();
     }

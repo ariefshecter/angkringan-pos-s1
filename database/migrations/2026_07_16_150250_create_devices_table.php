@@ -12,9 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('type', 20)->index();
-            $table->string('activation_code_hash');
+            $table->string('activation_code_hash')->nullable()->unique();
             $table->string('token_hash')->nullable()->unique();
             $table->boolean('is_active')->default(true);
+            $table->timestamp('activated_at')->nullable();
             $table->timestamp('last_seen_at')->nullable();
             $table->string('last_ip', 45)->nullable();
             $table->text('user_agent')->nullable();

@@ -73,7 +73,7 @@ class CategoryController extends Controller
     private function validateData(Request $request, ?Category $category = null): array
     {
         return $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->ignore($category)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('kategori', 'name')->ignore($category)],
             'sort_order' => ['required', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
         ]);

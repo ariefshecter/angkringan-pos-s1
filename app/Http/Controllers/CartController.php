@@ -22,7 +22,7 @@ class CartController extends Controller
     public function store(Request $request, CartService $cartService): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
-            'menu_id' => ['required', 'exists:menus,id'],
+            'menu_id' => ['required', 'exists:menu,id'],
             'quantity' => ['nullable', 'integer', 'min:1'],
         ]);
         $menu = Menu::query()->findOrFail($validated['menu_id']);

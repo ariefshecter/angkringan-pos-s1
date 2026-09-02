@@ -11,15 +11,31 @@ class EnsureStaffIsActive
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
+        $guard = $request->session()->get('staff_guard');
 
-        if (! $user || ! $user->is_active || ! in_array($user->role, ['admin', 'cashier'], true)) {
-            Auth::logout();
+        if (! in_array($guard, ['admin', 'kasir'], true) || ! Auth::guard($guard)->check()) {
+            $guard = collect(['admin', 'kasir'])->first(
+                fn (string $candidate): bool => Auth::guard($candidate)->check()
+            );
+        }
+
+        if (! $guard) {
+            return redirect()->guest(route('login'));
+        }
+
+        Auth::shouldUse($guard);
+        $request->session()->put('staff_guard', $guard);
+        $user = Auth::guard($guard)->user();
+        $request->setUserResolver(fn () => $user);
+
+        if (! $user?->is_active) {
+            Auth::guard($guard)->logout();
+            $request->session()->forget('staff_guard');
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return redirect()->route('login')->withErrors([
-                'email' => 'Akun tidak aktif atau tidak memiliki akses staf.',
+                'username' => 'Akun tidak aktif atau tidak memiliki akses staf.',
             ]);
         }
 

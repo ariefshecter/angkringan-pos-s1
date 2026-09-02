@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
+use App\Models\Kasir;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -10,35 +10,22 @@ class PasswordConfirmationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_confirm_password_screen_can_be_rendered(): void
+    public function test_active_staff_guard_can_confirm_password(): void
     {
-        $user = User::factory()->create();
+        $kasir = Kasir::factory()->create();
+        $this->activateDevice()->actingAs($kasir, 'kasir')->withSession(['staff_guard' => 'kasir'])
+            ->get(route('password.confirm'))->assertOk();
 
-        $response = $this->actingAs($user)->get('/confirm-password');
-
-        $response->assertStatus(200);
+        $this->post(route('password.confirm'), ['password' => 'password'])
+            ->assertSessionHasNoErrors()->assertRedirect();
     }
 
-    public function test_password_can_be_confirmed(): void
+    public function test_invalid_password_is_rejected_by_active_staff_guard(): void
     {
-        $user = User::factory()->create();
+        $kasir = Kasir::factory()->create();
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'password',
-        ]);
-
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
-    }
-
-    public function test_password_is_not_confirmed_with_invalid_password(): void
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
-        ]);
-
-        $response->assertSessionHasErrors();
+        $this->activateDevice()->actingAs($kasir, 'kasir')->withSession(['staff_guard' => 'kasir'])
+            ->post(route('password.confirm'), ['password' => 'wrong-password'])
+            ->assertSessionHasErrors('password');
     }
 }

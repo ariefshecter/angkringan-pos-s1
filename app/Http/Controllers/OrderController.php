@@ -4,16 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Services\OrderService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class OrderController extends Controller
 {
     public function index(Request $request): View
     {
         $transactions = Transaction::query()
+            ->latestPerOrder()
             ->withCount('items')
             ->when($request->filled('status'), fn ($query) => $query->where('payment_status', $request->string('status')))
             ->latest()
@@ -25,7 +29,7 @@ class OrderController extends Controller
 
     public function show(Transaction $transaction): View
     {
-        return view('admin.orders.show', ['transaction' => $transaction->load(['items', 'handler'])]);
+        return view('admin.orders.show', ['transaction' => $transaction->load(['items', 'admin', 'kasir'])]);
     }
 
     public function feed(OrderService $orders): JsonResponse
@@ -34,9 +38,11 @@ class OrderController extends Controller
             ->where('payment_status', Transaction::PAYMENT_PENDING)
             ->whereNotNull('expires_at')
             ->where('expires_at', '<=', now())
-            ->each(fn (Transaction $transaction) => $orders->cancel($transaction, Transaction::PAYMENT_EXPIRED));
+            ->latestPerOrder()
+            ->each(fn (Transaction $transaction) => $orders->cancelPending($transaction, Transaction::PAYMENT_EXPIRED));
 
         $transactions = Transaction::query()
+            ->latestPerOrder()
             ->where(function ($query): void {
                 $query->where(function ($query): void {
                     $query->where('payment_method', 'cash')
@@ -71,7 +77,17 @@ class OrderController extends Controller
 
     public function cancel(Transaction $transaction, OrderService $orders): RedirectResponse
     {
-        $orders->cancel($transaction);
+        try {
+            $transaction = $orders->cancelPending($transaction);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->with('error', $exception->getMessage());
+        }
+
+        if ($transaction->payment_status !== Transaction::PAYMENT_CANCELLED) {
+            return back()->with('error', 'Pesanan tidak dapat dibatalkan karena statusnya sudah berubah.');
+        }
 
         return redirect()->route('admin.orders.index')->with('success', 'Pesanan dibatalkan dan reservasi stok dilepas.');
     }
@@ -80,11 +96,24 @@ class OrderController extends Controller
     {
         abort_unless($transaction->payment_status === Transaction::PAYMENT_PAID, 404);
 
-        return view('admin.orders.receipt', ['transaction' => $transaction->load(['items', 'handler'])]);
+        return view('admin.orders.receipt', ['transaction' => $transaction->load(['items', 'admin', 'kasir'])]);
+    }
+
+    public function receiptPdf(Transaction $transaction): Response
+    {
+        abort_unless($transaction->payment_status === Transaction::PAYMENT_PAID, 404);
+
+        $transaction->load(['items', 'admin', 'kasir']);
+
+        return Pdf::loadView('pdf.receipt', compact('transaction'))
+            ->setPaper([0, 0, 226.77, 566.93])
+            ->download("struk-{$transaction->order_number}.pdf");
     }
 
     public function markPrinted(Transaction $transaction): JsonResponse
     {
+        abort_unless($transaction->payment_status === Transaction::PAYMENT_PAID, 404);
+
         $transaction->update(['printed_at' => now()]);
 
         return response()->json(['printed_at' => $transaction->printed_at?->toIso8601String()]);

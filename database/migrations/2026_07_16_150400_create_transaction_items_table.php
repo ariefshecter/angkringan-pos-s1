@@ -8,10 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('transaction_items', function (Blueprint $table) {
+        Schema::create('detail_transaksi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('menu_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('transaction_id')->constrained('transaksi')->cascadeOnDelete();
+            $table->foreignId('menu_id')->nullable()->constrained('menu')->nullOnDelete();
             $table->string('menu_name');
             $table->unsignedBigInteger('price');
             $table->unsignedInteger('quantity');
@@ -24,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('transaction_items');
+        Schema::dropIfExists('detail_transaksi');
     }
 };

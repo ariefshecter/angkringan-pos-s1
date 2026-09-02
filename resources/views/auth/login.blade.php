@@ -2,7 +2,7 @@
     <div class="mb-6 text-center">
         <div class="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-amber-500 text-xl font-bold text-white">S1</div>
         <h1 class="text-2xl font-bold text-stone-900">Masuk ke Angkringan S1</h1>
-        <p class="mt-1 text-sm text-stone-500">Khusus admin dan kasir</p>
+        <p class="mt-1 text-sm text-stone-500">Login Admin dan Kasir tanpa aktivasi perangkat</p>
     </div>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -10,11 +10,11 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Username -->
         <div>
-            <x-input-label for="email" value="Email" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-label for="username" value="Username" />
+            <x-text-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('username')" class="mt-2" />
         </div>
 
         <!-- Password -->
@@ -49,4 +49,8 @@
             </x-primary-button>
         </div>
     </form>
+    <div class="mt-6 border-t border-stone-200 pt-5 text-center">
+        <p class="text-xs text-stone-500">Menyiapkan terminal pelanggan?</p>
+        <a href="{{ route('device.activate') }}" class="mt-2 inline-block text-sm font-semibold text-amber-700 hover:text-amber-800">Aktivasi Kiosk Pelanggan</a>
+    </div>
 </x-guest-layout>

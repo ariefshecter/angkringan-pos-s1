@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h1 class="text-2xl font-bold text-stone-900">Kelola Perangkat</h1>
-        <p class="text-sm text-stone-500">Atur perangkat admin dan kiosk yang diizinkan mengakses sistem.</p>
+        <p class="text-sm text-stone-500">Atur terminal kiosk pelanggan. Admin dan Kasir tidak memerlukan aktivasi perangkat.</p>
     </x-slot>
 
     <div class="py-8">
@@ -24,11 +24,10 @@
                 </div>
             @endif
 
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><p class="text-xs font-medium uppercase text-stone-500">Total perangkat</p><p class="mt-2 text-3xl font-black text-stone-950">{{ $summary['total'] }}</p></div>
-                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><p class="text-xs font-medium uppercase text-stone-500">Perangkat aktif</p><p class="mt-2 text-3xl font-black text-emerald-600">{{ $summary['active'] }}</p></div>
-                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><p class="text-xs font-medium uppercase text-stone-500">Kiosk aktif</p><p class="mt-2 text-3xl font-black text-fuchsia-600">{{ $summary['kiosks'] }}</p></div>
-                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><p class="text-xs font-medium uppercase text-stone-500">Admin aktif</p><p class="mt-2 text-3xl font-black text-amber-600">{{ $summary['admins'] }}</p></div>
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><p class="text-xs font-medium uppercase text-stone-500">Total kiosk</p><p class="mt-2 text-3xl font-black text-stone-950">{{ $summary['total'] }}</p></div>
+                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><p class="text-xs font-medium uppercase text-stone-500">Kiosk aktif</p><p class="mt-2 text-3xl font-black text-emerald-600">{{ $summary['kiosks'] }}</p></div>
+                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><p class="text-xs font-medium uppercase text-stone-500">Kiosk terhubung</p><p class="mt-2 text-3xl font-black text-fuchsia-600">{{ $summary['connected'] }}</p></div>
             </div>
 
             <div class="flex justify-end">
@@ -43,13 +42,12 @@
                         </thead>
                         <tbody class="divide-y divide-stone-100">
                             @forelse($devices as $device)
-                                @php($isCurrent = $currentDevice?->is($device) ?? false)
-                                <tr class="{{ $isCurrent ? 'bg-amber-50/60' : '' }}">
+                                <tr>
                                     <td class="px-6 py-4">
                                         <p class="font-semibold text-stone-950">{{ $device->name }}</p>
-                                        <p class="mt-1 text-xs text-stone-500">ID perangkat: {{ $device->id }} @if($isCurrent)<span class="font-semibold text-amber-700">• Perangkat ini</span>@endif</p>
+                                        <p class="mt-1 text-xs text-stone-500">ID perangkat: {{ $device->id }}</p>
                                     </td>
-                                    <td class="px-6 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $device->type === 'admin' ? 'bg-amber-100 text-amber-800' : 'bg-fuchsia-100 text-fuchsia-800' }}">{{ $device->type === 'admin' ? 'Admin' : 'Kiosk' }}</span></td>
+                                    <td class="px-6 py-4"><span class="rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-800">Kiosk Pelanggan</span></td>
                                     <td class="px-6 py-4">
                                         @if(! $device->is_active)
                                             <span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">Nonaktif</span>
@@ -66,10 +64,7 @@
                                         @if($device->last_ip)<p class="mt-1 text-xs text-stone-500">IP {{ $device->last_ip }}</p>@endif
                                     </td>
                                     <td class="px-6 py-4">
-                                        @if($isCurrent)
-                                            <p class="text-right text-xs font-medium text-stone-500">Dilindungi</p>
-                                        @else
-                                            <div class="flex justify-end gap-2">
+                                        <div class="flex justify-end gap-2">
                                                 <form method="POST" action="{{ route('admin.devices.regenerate', $device) }}" data-confirm="Kode lama tidak dapat digunakan lagi dan koneksi perangkat sebelumnya akan diputus." data-confirm-title="Buat kode aktivasi baru" data-confirm-button="Buat kode baru" data-confirm-tone="warning">
                                                     @csrf
                                                     <button class="rounded-lg border border-amber-300 px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-50">Kode baru</button>
@@ -78,8 +73,7 @@
                                                     @csrf @method('PATCH')
                                                     <button class="rounded-lg border px-3 py-2 text-xs font-semibold {{ $device->is_active ? 'border-red-300 text-red-700 hover:bg-red-50' : 'border-emerald-300 text-emerald-700 hover:bg-emerald-50' }}">{{ $device->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</button>
                                                 </form>
-                                            </div>
-                                        @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

@@ -92,8 +92,8 @@ class MenuController extends Controller
     private function validateData(Request $request, ?Menu $menu = null): array
     {
         return $request->validate([
-            'category_id' => ['required', 'exists:categories,id'],
-            'name' => ['required', 'string', 'max:255', Rule::unique('menus', 'name')->ignore($menu)],
+            'category_id' => ['required', 'exists:kategori,id'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('menu', 'name')->ignore($menu)],
             'description' => ['nullable', 'string', 'max:2000'],
             'price' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],

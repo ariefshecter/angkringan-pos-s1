@@ -3,6 +3,10 @@
 @section('title', 'Pembayaran')
 
 @section('content')
+    @php
+        $selectedPaymentMethod = old('payment_method', $editingPaymentMethod ?? 'cash');
+        $selectedPaymentChannel = old('payment_channel', $editingPaymentChannel ?? null);
+    @endphp
     <div class="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-5">
         <section class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm lg:col-span-2">
             <h2 class="text-lg font-bold">Ringkasan</h2>
@@ -30,7 +34,7 @@
             <div class="mt-5 space-y-5">
                 <div>
                     <x-input-label for="customer_name" value="Nama pelanggan" />
-                    <x-text-input id="customer_name" name="customer_name" class="mt-1 block w-full" :value="old('customer_name')" required autofocus />
+                    <x-text-input id="customer_name" name="customer_name" class="mt-1 block w-full" :value="old('customer_name', $editingCustomerName ?? '')" required autofocus />
                     <x-input-error :messages="$errors->get('customer_name')" class="mt-2" />
                 </div>
 
@@ -38,17 +42,17 @@
                     <legend class="mb-3 text-sm font-medium text-stone-700">Metode pembayaran</legend>
                     <div class="grid gap-3 sm:grid-cols-3">
                         <label class="cursor-pointer rounded-xl border border-stone-300 p-4 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
-                            <input type="radio" name="payment_method" value="cash" class="text-amber-600 focus:ring-amber-500" @checked(old('payment_method', 'cash') === 'cash')>
+                            <input type="radio" name="payment_method" value="cash" class="text-amber-600 focus:ring-amber-500" @checked($selectedPaymentMethod === 'cash')>
                             <span class="ml-2 font-semibold">Tunai</span>
                             <p class="mt-1 pl-6 text-xs text-stone-500">Bayar ke kasir</p>
                         </label>
                         <label class="cursor-pointer rounded-xl border border-stone-300 p-4 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
-                            <input type="radio" name="payment_method" value="qris" class="text-amber-600 focus:ring-amber-500" @checked(old('payment_method') === 'qris')>
+                            <input type="radio" name="payment_method" value="qris" class="text-amber-600 focus:ring-amber-500" @checked($selectedPaymentMethod === 'qris')>
                             <span class="ml-2 font-semibold">QRIS (Auto)</span>
                             <p class="mt-1 pl-6 text-xs text-stone-500">Langsung QRIS</p>
                         </label>
                         <label data-bank-method-card class="cursor-pointer rounded-xl border border-stone-300 p-4 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
-                            <input type="radio" name="payment_method" value="bank_transfer" class="text-amber-600 focus:ring-amber-500" @checked(old('payment_method') === 'bank_transfer')>
+                            <input type="radio" name="payment_method" value="bank_transfer" class="text-amber-600 focus:ring-amber-500" @checked($selectedPaymentMethod === 'bank_transfer')>
                             <span class="ml-2 font-semibold">Transfer Bank</span>
                             <p id="selected-bank-summary" class="mt-1 pl-6 text-xs text-stone-500">Virtual Account</p>
                         </label>
@@ -69,7 +73,7 @@
                             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
                                 @foreach($bankChannels as $channel => $bank)
                                     <label class="cursor-pointer text-center">
-                                        <input type="radio" name="payment_channel" value="{{ $channel }}" data-bank-label="{{ $channel === 'other_bank_va' ? 'Bank Lainnya — via Permata VA' : $bank.' — Virtual Account' }}" class="peer sr-only" @checked(old('payment_channel') === $channel)>
+                                        <input type="radio" name="payment_channel" value="{{ $channel }}" data-bank-label="{{ $channel === 'other_bank_va' ? 'Bank Lainnya — via Permata VA' : $bank.' — Virtual Account' }}" class="peer sr-only" @checked($selectedPaymentChannel === $channel)>
                                         <span class="grid min-h-14 place-items-center rounded-lg border-2 border-stone-400 bg-white px-3 py-2 text-sm font-black text-stone-900 transition peer-checked:border-amber-400 peer-checked:bg-amber-50 peer-checked:ring-2 peer-checked:ring-amber-400">{{ $bank }}</span>
                                         <span class="mt-1 block text-xs text-stone-300">{{ $channel === 'other_bank_va' ? 'Transfer antarbank' : 'Virtual Account' }}</span>
                                     </label>
@@ -90,16 +94,16 @@
 
                 <div>
                     <x-input-label for="notes" value="Catatan pesanan (opsional)" />
-                    <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full rounded-md border-stone-300 focus:border-amber-500 focus:ring-amber-500">{{ old('notes') }}</textarea>
+                    <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full rounded-md border-stone-300 focus:border-amber-500 focus:ring-amber-500">{{ old('notes', $editingNotes ?? '') }}</textarea>
                 </div>
 
-                <button class="w-full rounded-xl bg-amber-500 px-4 py-3 font-bold text-white hover:bg-amber-600">Buat pesanan</button>
+                <button class="w-full rounded-xl bg-amber-500 px-4 py-3 font-bold text-white hover:bg-amber-600">{{ $editingOrder ? 'Perbarui pembayaran' : 'Buat pesanan' }}</button>
             </div>
         </form>
 
-        <form id="discard-checkout-form" method="POST" action="{{ route('kiosk.cart.clear') }}" class="lg:col-start-3 lg:col-span-3" data-confirm="Semua produk akan dihapus dari pesanan dan stok akan dikembalikan. Lanjutkan?" data-confirm-title="Batalkan pesanan" data-confirm-button="Ya, batalkan">
+        <form id="discard-checkout-form" method="POST" action="{{ $editingOrder ? route('kiosk.orders.cancel-order', $editingOrder) : route('kiosk.cart.clear') }}" class="lg:col-start-3 lg:col-span-3" data-confirm="{{ $editingOrder ? 'Pesanan akan dibatalkan sepenuhnya dan stok akan dikembalikan.' : 'Semua produk akan dihapus dari pesanan dan stok akan dikembalikan.' }} Lanjutkan?" data-confirm-title="Batalkan pesanan" data-confirm-button="Ya, batalkan">
             @csrf
-            <button type="submit" class="w-full rounded-xl border border-red-300 bg-white px-4 py-3 font-bold text-red-600 transition hover:bg-red-600 hover:text-white">Batalkan pesanan</button>
+            <button type="submit" class="w-full rounded-xl border border-red-300 bg-white px-4 py-3 font-bold text-red-600 transition hover:bg-red-600 hover:text-white">{{ $editingOrder ? 'Batalkan pesanan ini' : 'Batalkan pesanan' }}</button>
         </form>
     </div>
 @endsection
@@ -116,7 +120,7 @@
         const discardCheckoutForm = document.getElementById('discard-checkout-form');
         const selectedBankSummary = document.getElementById('selected-bank-summary');
         const bankMethodCard = document.querySelector('[data-bank-method-card]');
-        let confirmedBank = @json(old('payment_channel')) || null;
+        let confirmedBank = @json(old('payment_channel', $editingPaymentChannel ?? null)) || null;
         let lastNonBankMethod = document.querySelector('input[name="payment_method"]:checked')?.value === 'qris' ? 'qris' : 'cash';
 
         function renderBankSelection() {

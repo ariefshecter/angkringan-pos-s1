@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1 class="truncate text-base font-extrabold uppercase tracking-wide text-stone-950">Dashboard Admin</h1>
+        <h1 class="truncate text-base font-extrabold uppercase tracking-wide text-stone-950">Dashboard {{ auth()->user() instanceof \App\Models\Admin ? 'Admin' : 'Kasir' }}</h1>
     </x-slot>
 
     <div class="px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
@@ -36,12 +36,12 @@
                     </article>
 
                     <article class="min-h-24 rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:min-h-28">
-                        <p class="text-center text-[11px] font-medium text-stone-600">Pendapatan Cash vs Digital</p>
+                        <p class="text-center text-[11px] font-medium text-stone-600">Transaksi Tunai vs Digital</p>
                         @php
                             $maxPaymentCount = max(1, $cashOrderCount, $digitalOrderCount);
                         @endphp
                         <div class="mt-3 flex h-16 items-end justify-center gap-8">
-                            <div class="text-center"><div class="mx-auto w-7 border border-stone-600 bg-stone-100" style="height: {{ max(8, round(($cashOrderCount / $maxPaymentCount) * 48)) }}px"></div><p class="mt-1 text-[9px]">Cash ({{ $cashOrderCount }})</p></div>
+                            <div class="text-center"><div class="mx-auto w-7 border border-stone-600 bg-stone-100" style="height: {{ max(8, round(($cashOrderCount / $maxPaymentCount) * 48)) }}px"></div><p class="mt-1 text-[9px]">Tunai ({{ $cashOrderCount }})</p></div>
                             <div class="text-center"><div class="mx-auto w-7 border border-stone-600 bg-stone-800" style="height: {{ max(8, round(($digitalOrderCount / $maxPaymentCount) * 48)) }}px"></div><p class="mt-1 text-[9px]">Digital ({{ $digitalOrderCount }})</p></div>
                         </div>
                     </article>
@@ -63,6 +63,8 @@
                                 $statusLabel = match ($transaction->payment_status) {
                                     'paid' => 'Lunas',
                                     'pending' => 'Pending',
+                                    'replacing' => 'Mengganti metode pembayaran',
+                                    'replaced' => 'Metode pembayaran diganti',
                                     'cancelled' => 'Dibatalkan',
                                     'expired' => 'Kedaluwarsa',
                                     'failed' => 'Gagal',
@@ -103,7 +105,7 @@
                                         <td class="px-4 py-4">{{ $transaction->customer_name }}</td>
                                         <td class="whitespace-nowrap px-4 py-4 font-semibold">Rp {{ number_format($transaction->total, 0, ',', '.') }}</td>
                                         <td class="px-4 py-4 font-semibold uppercase">{{ $transaction->payment_label }}</td>
-                                        <td class="px-4 py-4"><span class="font-bold capitalize {{ $transaction->payment_status === 'paid' ? 'text-emerald-700' : ($transaction->payment_status === 'pending' ? 'text-amber-700' : 'text-stone-500') }}">{{ $transaction->payment_status }}</span></td>
+                                    <td class="px-4 py-4"><span class="font-bold {{ $transaction->payment_status === 'paid' ? 'text-emerald-700' : ($transaction->payment_status === 'pending' ? 'text-amber-700' : 'text-stone-500') }}">{{ $transaction->payment_status_label }}</span></td>
                                         <td class="min-w-40 px-6 py-3">@include('admin.orders.partials.dashboard-actions')</td>
                                     </tr>
                                 @empty

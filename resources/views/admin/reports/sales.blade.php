@@ -8,14 +8,39 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
-            <section class="flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <section class="flex flex-col gap-5 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
                 <div>
                     <p class="text-sm font-bold text-stone-900">{{ $periodLabel }}</p>
                     <p class="mt-1 text-xs text-stone-500">{{ $rangeLabel }}</p>
                 </div>
-                <div class="inline-flex w-fit rounded-xl bg-stone-100 p-1">
-                    <a href="{{ route('admin.reports.sales', ['period' => 'weekly']) }}" class="rounded-lg px-5 py-2 text-sm font-bold transition {{ $period === 'weekly' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:bg-white' }}">Mingguan</a>
-                    <a href="{{ route('admin.reports.sales', ['period' => 'monthly']) }}" class="rounded-lg px-5 py-2 text-sm font-bold transition {{ $period === 'monthly' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:bg-white' }}">Bulanan</a>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <form method="GET" action="{{ route('admin.reports.sales') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <label class="text-xs font-semibold text-stone-600">Mode
+                            <select name="mode" class="mt-1 block w-full rounded-lg border-stone-300 text-sm focus:border-amber-500 focus:ring-amber-500" onchange="this.form.submit()">
+                                <option value="daily" @selected($mode === 'daily')>Harian</option>
+                                <option value="monthly" @selected($mode === 'monthly')>Bulanan</option>
+                            </select>
+                        </label>
+                        @if($mode === 'monthly')
+                            <label class="text-xs font-semibold text-stone-600">Bulan
+                                <input type="month" name="month" value="{{ $month }}" class="mt-1 block rounded-lg border-stone-300 text-sm focus:border-amber-500 focus:ring-amber-500">
+                            </label>
+                        @else
+                            <label class="text-xs font-semibold text-stone-600">Tanggal
+                                <input type="date" name="date" value="{{ $date }}" class="mt-1 block rounded-lg border-stone-300 text-sm focus:border-amber-500 focus:ring-amber-500">
+                            </label>
+                        @endif
+                        <button class="rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-700">Tampilkan</button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.reports.store') }}">
+                        @csrf
+                        <input type="hidden" name="mode" value="{{ $mode }}">
+                        <input type="hidden" name="date" value="{{ $date }}">
+                        <input type="hidden" name="month" value="{{ $month }}">
+                        <button class="w-full rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-amber-600">Simpan Rekap</button>
+                    </form>
+                    <a href="{{ route('admin.reports.snapshots') }}" class="rounded-lg border border-stone-300 px-4 py-2.5 text-center text-sm font-semibold text-stone-700 hover:bg-stone-50">Riwayat Rekap</a>
+                    <a href="{{ route('admin.reports.pdf', ['mode' => $mode, 'date' => $date, 'month' => $month]) }}" class="rounded-lg border border-stone-300 px-4 py-2.5 text-center text-sm font-semibold text-stone-700 hover:bg-stone-50">Unduh PDF</a>
                 </div>
             </section>
 

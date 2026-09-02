@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h1 class="text-2xl font-bold text-stone-900">Tambah Perangkat</h1>
-        <p class="text-sm text-stone-500">Setiap perangkat fisik harus memiliki kode aktivasi sendiri.</p>
+        <p class="text-sm text-stone-500">Tambahkan terminal kiosk yang digunakan pelanggan untuk memesan.</p>
     </x-slot>
 
     <div class="py-8">
@@ -16,17 +16,8 @@
                     <p class="mt-2 text-xs text-stone-500">Gunakan nama yang menunjukkan posisi atau nomor perangkat.</p>
                 </div>
 
-                <div>
-                    <x-input-label for="type" value="Jenis perangkat" />
-                    <select id="type" name="type" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500" required>
-                        <option value="kiosk" @selected(old('type', 'kiosk') === 'kiosk')>Kiosk — untuk pelanggan memesan</option>
-                        <option value="admin" @selected(old('type') === 'admin')>Admin — untuk pengelolaan dan kasir</option>
-                    </select>
-                    <x-input-error :messages="$errors->get('type')" class="mt-2" />
-                </div>
-
                 <div class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
-                    Setelah disimpan, sistem akan menampilkan kode aktivasi acak. Kode hanya tampil satu kali dan digunakan pada satu perangkat.
+                    Sistem akan membuat kode aktivasi kiosk yang hanya tampil satu kali dan hanya dapat digunakan pada satu perangkat pelanggan.
                 </div>
 
                 <div class="flex justify-end gap-3 border-t border-stone-100 pt-5">

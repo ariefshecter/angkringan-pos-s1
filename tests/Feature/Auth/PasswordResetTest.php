@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
+use App\Models\Admin;
+use App\Models\Kasir;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -12,66 +14,40 @@ class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_reset_password_link_screen_can_be_rendered(): void
+    public function test_admin_reset_password_link_screen_can_be_rendered(): void
     {
-        $this->activateDevice();
-        $response = $this->get('/forgot-password');
-
-        $response->assertStatus(200);
+        $this->get(route('password.request'))->assertOk();
     }
 
-    public function test_reset_password_link_can_be_requested(): void
+    public function test_admin_can_request_and_use_a_password_reset_link(): void
     {
-        $this->activateDevice();
         Notification::fake();
+        $admin = Admin::factory()->create();
+        $this->post(route('password.email'), ['email' => $admin->email]);
 
-        $user = User::factory()->create();
-
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class);
-    }
-
-    public function test_reset_password_screen_can_be_rendered(): void
-    {
-        $this->activateDevice();
-        Notification::fake();
-
-        $user = User::factory()->create();
-
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-            $response = $this->get('/reset-password/'.$notification->token);
-
-            $response->assertStatus(200);
-
-            return true;
-        });
-    }
-
-    public function test_password_can_be_reset_with_valid_token(): void
-    {
-        $this->activateDevice();
-        Notification::fake();
-
-        $user = User::factory()->create();
-
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post('/reset-password', [
+        Notification::assertSentTo($admin, ResetPassword::class, function (ResetPassword $notification) use ($admin): bool {
+            $this->get(route('password.reset', $notification->token))->assertOk();
+            $this->post(route('password.store'), [
                 'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
-            ]);
-
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect(route('login'));
+                'email' => $admin->email,
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])->assertSessionHasNoErrors()->assertRedirect(route('login'));
 
             return true;
         });
+
+        $this->assertTrue(Hash::check('new-password', $admin->refresh()->password));
+    }
+
+    public function test_kasir_can_not_request_a_public_password_reset_link(): void
+    {
+        Notification::fake();
+        $kasir = Kasir::factory()->create();
+
+        $this->post(route('password.email'), ['email' => $kasir->email])
+            ->assertSessionHasErrors('email');
+
+        Notification::assertNothingSent();
     }
 }

@@ -18,7 +18,8 @@ Schedule::call(function (): void {
         ->where('payment_status', Transaction::PAYMENT_PENDING)
         ->whereNotNull('expires_at')
         ->where('expires_at', '<=', now())
-        ->each(fn (Transaction $transaction) => $orders->cancel($transaction, Transaction::PAYMENT_EXPIRED));
+        ->latestPerOrder()
+        ->each(fn (Transaction $transaction) => $orders->cancelPending($transaction, Transaction::PAYMENT_EXPIRED));
 })->name('expire-pending-orders')->everyMinute()->withoutOverlapping();
 
 Schedule::call(fn () => app(CartService::class)->purgeExpired())

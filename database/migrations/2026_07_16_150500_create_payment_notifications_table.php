@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('payment_notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('transaction_id')->nullable()->constrained('transaksi')->nullOnDelete();
             $table->string('order_number', 50)->index();
             $table->string('transaction_status', 50)->nullable();
             $table->string('signature_key')->nullable();

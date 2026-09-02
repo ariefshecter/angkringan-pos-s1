@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 abstract class TestCase extends BaseTestCase
 {
-    protected function activateDevice(string $type = Device::TYPE_ADMIN): static
+    protected function activateDevice(string $type = Device::TYPE_KIOSK): static
     {
         $token = Str::random(80);
         Device::query()->create([
