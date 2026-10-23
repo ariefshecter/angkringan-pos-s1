@@ -20,6 +20,7 @@
         <a href="{{ route('admin.orders.index') }}" class="block rounded-xl border px-4 py-3 transition {{ request()->routeIs('admin.orders.*') && !request()->filled('status') ? 'border-amber-400/30 bg-amber-400 font-semibold text-stone-950 shadow-lg shadow-amber-950/20' : 'border-transparent text-stone-300 hover:bg-white/10 hover:text-white' }}">Riwayat Transaksi</a>
         @if(auth()->user() instanceof \App\Models\Admin)
             <a href="{{ route('admin.reports.sales') }}" class="block rounded-xl border px-4 py-3 transition {{ request()->routeIs('admin.reports.*') ? 'border-amber-400/30 bg-amber-400 font-semibold text-stone-950 shadow-lg shadow-amber-950/20' : 'border-transparent text-stone-300 hover:bg-white/10 hover:text-white' }}">Laporan Penjualan</a>
+            <a href="{{ route('admin.settings.midtrans.edit') }}" class="block rounded-xl border px-4 py-3 transition {{ request()->routeIs('admin.settings.midtrans.*') ? 'border-amber-400/30 bg-amber-400 font-semibold text-stone-950 shadow-lg shadow-amber-950/20' : 'border-transparent text-stone-300 hover:bg-white/10 hover:text-white' }}">Pengaturan Midtrans</a>
         @endif
     </nav>
 

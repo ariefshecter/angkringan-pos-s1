@@ -9,6 +9,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\KioskController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MidtransSettingController;
 use App\Http\Controllers\MidtransWebhookController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
@@ -84,6 +85,9 @@ Route::middleware('staff')->group(function () {
         Route::resource('kasir', KasirController::class)->except(['show', 'destroy']);
         Route::patch('kasir/{kasir}/toggle', [KasirController::class, 'toggle'])->name('kasir.toggle');
         Route::patch('kasir/{kasir}/reset-password', [KasirController::class, 'resetPassword'])->name('kasir.reset-password');
+        Route::get('settings/midtrans', [MidtransSettingController::class, 'edit'])->name('settings.midtrans.edit');
+        Route::put('settings/midtrans', [MidtransSettingController::class, 'update'])->name('settings.midtrans.update');
+        Route::post('settings/midtrans/test', [MidtransSettingController::class, 'testConnection'])->name('settings.midtrans.test');
     });
 });
 
