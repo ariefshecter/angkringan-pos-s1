@@ -15,8 +15,8 @@ function ensureNotificationUi() {
 
     const root = document.createElement('div');
     root.innerHTML = `
-        <div id="app-toast-container" class="pointer-events-none fixed right-4 top-4 z-[300] flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3" aria-live="polite" aria-atomic="true"></div>
-        <div id="app-confirm-modal" class="fixed inset-0 z-[310] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="app-confirm-title">
+        <div id="app-toast-container" class="pointer-events-none fixed inset-x-3 top-[max(1rem,env(safe-area-inset-top))] z-[1000] flex max-h-[calc(100vh-2rem)] w-auto flex-col items-stretch gap-3 overflow-y-auto sm:left-auto sm:right-5 sm:w-[min(24rem,calc(100vw-2rem))]" aria-live="polite" aria-atomic="true"></div>
+        <div id="app-confirm-modal" class="fixed inset-0 z-[1010] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="app-confirm-title">
             <button type="button" data-app-confirm-cancel class="absolute inset-0 bg-stone-950/60 backdrop-blur-sm" aria-label="Tutup konfirmasi"></button>
             <div class="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-stone-900/10">
                 <div class="p-6 text-center">
@@ -30,7 +30,7 @@ function ensureNotificationUi() {
                 </div>
             </div>
         </div>
-        <div id="app-copy-modal" class="fixed inset-0 z-[320] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="app-copy-title">
+        <div id="app-copy-modal" class="fixed inset-0 z-[1020] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="app-copy-title">
             <button type="button" data-app-copy-close class="absolute inset-0 bg-stone-950/60 backdrop-blur-sm" aria-label="Tutup"></button>
             <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                 <h2 id="app-copy-title" class="text-xl font-black text-stone-950">Salin kode aktivasi</h2>
@@ -83,7 +83,7 @@ window.appToast = (message, type = 'info', options = {}) => {
     };
     const style = styles[type] || styles.info;
     const toast = document.createElement('div');
-    toast.className = `pointer-events-auto translate-x-8 overflow-hidden rounded-2xl border-l-4 ${style.border} bg-white opacity-0 shadow-2xl ring-1 ring-stone-900/10 transition duration-300`;
+    toast.className = `pointer-events-auto translate-y-[-8px] overflow-hidden rounded-2xl border-l-4 ${style.border} bg-white opacity-0 shadow-2xl ring-1 ring-stone-900/10 transition duration-300`;
     toast.innerHTML = `
         <div class="flex gap-3 p-4">
             <div data-toast-icon class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-black"></div>
@@ -105,13 +105,13 @@ window.appToast = (message, type = 'info', options = {}) => {
     const progress = toast.querySelector('[data-toast-progress]');
     progress.style.backgroundColor = style.progress;
     const remove = () => {
-        toast.classList.add('translate-x-8', 'opacity-0');
+        toast.classList.add('translate-y-[-8px]', 'opacity-0');
         setTimeout(() => toast.remove(), 300);
     };
     toast.querySelector('[data-toast-close]').addEventListener('click', remove);
     ui.toasts.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.remove('translate-x-8', 'opacity-0'));
-    const duration = options.duration ?? 4500;
+    requestAnimationFrame(() => toast.classList.remove('translate-y-[-8px]', 'opacity-0'));
+    const duration = options.duration ?? 5000;
     progress.animate([{transform: 'scaleX(1)'}, {transform: 'scaleX(0)'}], {duration, easing: 'linear', fill: 'forwards'});
     setTimeout(remove, duration);
 };

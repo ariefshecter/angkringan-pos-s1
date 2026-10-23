@@ -10,23 +10,23 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased">
-    <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-[#f4f5f7]">
+    <div x-data="{ sidebarOpen: false }" class="min-h-screen bg-[#f5f2ec]">
         @include('layouts.navigation')
 
         <div class="min-h-screen lg:pl-60">
-            <header class="sticky top-0 z-30 flex min-h-16 items-center justify-between border-b border-stone-200 bg-white px-4 py-3 sm:px-6 lg:px-8">
+            <header class="sticky top-0 z-30 flex min-h-[4.5rem] items-center justify-between border-b border-stone-200/90 bg-white/95 px-4 py-3 shadow-[0_8px_24px_-24px_rgba(28,25,23,0.8)] backdrop-blur sm:px-6 lg:px-8">
                 <div class="flex min-w-0 items-center gap-3">
-                    <button type="button" @click="sidebarOpen = true" class="rounded-lg border border-stone-300 p-2 text-stone-600 lg:hidden" aria-label="Buka navigasi">
+                    <button type="button" @click="sidebarOpen = true" class="rounded-xl border border-stone-200 bg-stone-50 p-2.5 text-stone-600 transition hover:border-amber-400 hover:text-stone-950 lg:hidden" aria-label="Buka navigasi">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                     </button>
                     @isset($header)<div class="min-w-0">{{ $header }}</div>@endisset
                 </div>
 
                 <div class="flex shrink-0 items-center gap-3">
-                    <div class="grid h-9 w-9 place-items-center rounded-full border border-stone-500 text-stone-700">
+                    <div class="grid h-10 w-10 place-items-center rounded-2xl bg-stone-950 text-amber-400 shadow-sm">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.1a7.5 7.5 0 0 1 15 0 17.9 17.9 0 0 1-15 0Z"/></svg>
                     </div>
-                    <div class="hidden sm:block"><p class="text-xs font-semibold text-stone-900">{{ auth()->user()->name }}</p><p class="text-[10px] capitalize text-stone-500">Role: {{ session('staff_guard') }}</p></div>
+                    <div class="hidden sm:block"><p class="text-xs font-bold text-stone-900">{{ auth()->user()->name }}</p><p class="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-stone-500">{{ session('staff_guard') }}</p></div>
                 </div>
             </header>
 
@@ -34,7 +34,7 @@
         </div>
 
         @auth
-            <button id="enable-notifications" type="button" class="fixed bottom-5 left-5 z-[60] rounded-lg border border-amber-300 bg-white px-4 py-2 text-xs font-semibold text-amber-800 shadow-lg lg:left-64">Aktifkan suara</button>
+            <button id="enable-notifications" type="button" class="fixed bottom-5 left-4 z-[900] rounded-xl border border-amber-300 bg-white px-4 py-2.5 text-xs font-bold text-amber-800 shadow-lg transition hover:border-amber-500 hover:bg-amber-50 lg:left-64">Aktifkan suara</button>
             <script>
                 const orderFeedUrl = @json(route('admin.orders.feed'));
                 const dashboardUrl = @json(route('dashboard'));
@@ -67,7 +67,7 @@
                                 : `${latest.order_number} dari ${latest.customer_name} sudah dibayar dan menunggu diterima.`;
                             window.appToast(message, 'info', {
                                 title: newOrders.length > 1 ? `${newOrders.length} pesanan perlu ditindak` : 'Pesanan perlu ditindak',
-                                duration: 15000,
+                                duration: 8000,
                                 url: dashboardUrl,
                                 actionLabel: 'Buka dashboard',
                             });

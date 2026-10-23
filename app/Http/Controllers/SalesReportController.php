@@ -23,6 +23,8 @@ class SalesReportController extends Controller
             $filters['mode'],
             $filters['date'] ?? null,
             $filters['month'] ?? null,
+            $filters['end_date'] ?? null,
+            $filters['end_month'] ?? null,
         ));
     }
 
@@ -33,6 +35,8 @@ class SalesReportController extends Controller
             $filters['mode'],
             $filters['date'] ?? null,
             $filters['month'] ?? null,
+            $filters['end_date'] ?? null,
+            $filters['end_month'] ?? null,
         );
         /** @var Admin $admin */
         $admin = $request->user();
@@ -85,6 +89,8 @@ class SalesReportController extends Controller
             $filters['mode'],
             $filters['date'] ?? null,
             $filters['month'] ?? null,
+            $filters['end_date'] ?? null,
+            $filters['end_month'] ?? null,
         );
         $filename = 'laporan-'.$report['mode'].'-'.$report['start']->format('Y-m-d').'.pdf';
 
@@ -118,21 +124,30 @@ class SalesReportController extends Controller
         ])->setPaper('a4')->download("laporan-snapshot-{$report->id}.pdf");
     }
 
-    /** @return array{mode: string, date?: string, month?: string} */
+    /** @return array{mode: string, date?: string, end_date?: string, month?: string, end_month?: string} */
     private function validatedFilters(Request $request): array
     {
         $validated = $request->validate([
             'mode' => ['nullable', Rule::in(['daily', 'monthly'])],
-            'date' => ['nullable', 'required_if:mode,daily', 'date_format:Y-m-d'],
-            'month' => ['nullable', 'required_if:mode,monthly', 'date_format:Y-m'],
+            'date' => ['nullable', 'date_format:Y-m-d'],
+            'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date'],
+            'month' => ['nullable', 'date_format:Y-m'],
+            'end_month' => ['nullable', 'date_format:Y-m', 'after_or_equal:month'],
         ]);
         $mode = $validated['mode'] ?? 'daily';
 
         return [
             'mode' => $mode,
-            ...($mode === 'monthly'
-                ? ['month' => $validated['month'] ?? now()->format('Y-m')]
-                : ['date' => $validated['date'] ?? now()->toDateString()]),
+            ...match ($mode) {
+                'monthly' => [
+                    'month' => $validated['month'] ?? now()->format('Y-m'),
+                    'end_month' => $validated['end_month'] ?? $validated['month'] ?? now()->format('Y-m'),
+                ],
+                default => [
+                    'date' => $validated['date'] ?? now()->toDateString(),
+                    ...(! empty($validated['end_date']) ? ['end_date' => $validated['end_date']] : []),
+                ],
+            },
         ];
     }
 }

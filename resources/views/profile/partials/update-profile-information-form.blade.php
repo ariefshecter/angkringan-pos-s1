@@ -1,37 +1,36 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
+        <p class="ui-eyebrow">Identity</p>
+        <h2 class="mt-2 text-xl font-black tracking-tight text-stone-950">Informasi profil</h2>
 
-        <p class="mt-1 text-sm text-gray-600">Perbarui nama, username, dan email akun staf.</p>
+        <p class="mt-2 text-sm leading-6 text-stone-500">Perbarui nama, username, dan email akun staf.</p>
     </header>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-7 space-y-5">
         @csrf
         @method('patch')
 
-        <div>
+        <div class="space-y-2">
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
-        <div>
+        <div class="space-y-2">
             <x-input-label for="username" value="Username" />
             <x-text-input id="username" name="username" type="text" class="mt-1 block w-full" :value="old('username', $user->username)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('username')" />
         </div>
 
-        <div>
+        <div class="space-y-2">
             <x-input-label for="email" value="Email" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <div class="flex flex-wrap items-center gap-4 border-t border-stone-100 pt-5">
+            <x-primary-button>Simpan perubahan</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -39,7 +38,7 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
+                    class="text-sm font-semibold text-emerald-700"
                 >{{ __('Saved.') }}</p>
             @endif
         </div>

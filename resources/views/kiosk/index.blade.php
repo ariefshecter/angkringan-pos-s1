@@ -10,23 +10,23 @@
 
 @section('content')
     <div class="mx-auto max-w-[1600px] lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(340px,2fr)]">
-        <section id="catalog-section" class="min-w-0 bg-[#f8f4ff] px-4 py-7 sm:px-6 lg:px-8">
+        <section id="catalog-section" class="min-w-0 bg-[#f7f3eb] px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
             <div id="kiosk-catalog">
                 @include('kiosk.partials.catalog', ['categories' => $categories])
             </div>
         </section>
 
-        <aside class="border-t border-stone-300 bg-white lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:border-l lg:border-t-0">
-            <div class="flex h-full flex-col p-6 lg:p-8">
-                <div class="mb-5 flex items-center justify-between border-b border-stone-200 pb-4">
-                    <div><h1 class="text-lg font-black uppercase">Pesanan Dipilih</h1><p class="text-xs text-stone-500">Klik produk untuk menambah jumlah.</p></div>
-                    <span id="selected-count" class="grid h-8 min-w-8 place-items-center rounded-full bg-stone-900 px-2 text-xs font-bold text-white">{{ $cartCount }}</span>
+        <aside class="border-t border-stone-200 bg-white lg:sticky lg:top-[4.5rem] lg:h-[calc(100vh-4.5rem)] lg:border-l lg:border-t-0">
+            <div class="flex h-full flex-col p-5 sm:p-6 lg:p-8">
+                <div class="mb-5 flex items-center justify-between border-b border-stone-100 pb-5">
+                    <div><p class="ui-eyebrow">Order summary</p><h1 class="mt-1 text-lg font-black">Pesanan dipilih</h1><p class="mt-1 text-xs text-stone-500">Klik produk untuk menambah jumlah.</p></div>
+                    <span id="selected-count" class="grid h-9 min-w-9 place-items-center rounded-2xl bg-stone-950 px-2 text-xs font-bold text-amber-300">{{ $cartCount }}</span>
                 </div>
 
                 <div id="selected-items" class="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                     @forelse($cartItems as $item)
-                        <div class="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-stone-200 p-3" data-selected-item="{{ $item['menu']->id }}">
-                            <div class="h-16 w-16 overflow-hidden rounded-md border border-stone-300 bg-stone-50">
+                        <div class="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50/50 p-3" data-selected-item="{{ $item['menu']->id }}">
+                            <div class="h-14 w-14 overflow-hidden rounded-xl border border-stone-200 bg-stone-50">
                                 @if($item['menu']->image_path)<img src="{{ Storage::url($item['menu']->image_path) }}" alt="{{ $item['menu']->name }}" class="h-full w-full object-cover">@else<div class="grid h-full place-items-center text-[9px] font-semibold text-stone-400">[ Gambar ]</div>@endif
                             </div>
                             <div class="min-w-0"><p class="truncate text-sm font-bold">{{ $item['menu']->name }}</p><p class="mt-1 text-xs text-stone-500">{{ $item['quantity'] }} × Rp {{ number_format($item['menu']->price, 0, ',', '.') }}</p></div>
@@ -44,9 +44,9 @@
                     @endforelse
                 </div>
 
-                <div class="mt-5 border-t border-stone-300 pt-5">
+                <div class="mt-5 border-t border-stone-100 pt-5">
                     <div class="flex items-center justify-between text-lg font-black"><span>Total</span><span id="selected-total">Rp {{ number_format($cartTotal, 0, ',', '.') }}</span></div>
-                    <a id="pay-button" href="{{ route('kiosk.checkout.create') }}" class="mt-5 block w-full rounded border border-stone-950 px-5 py-4 text-center text-sm font-black uppercase tracking-wide transition hover:bg-stone-950 hover:text-white {{ $cartCount < 1 ? 'pointer-events-none opacity-40' : '' }}" aria-disabled="{{ $cartCount < 1 ? 'true' : 'false' }}">Bayar</a>
+                    <a id="pay-button" href="{{ route('kiosk.checkout.create') }}" class="mt-5 block w-full rounded-xl bg-amber-500 px-5 py-4 text-center text-sm font-black uppercase tracking-wide text-stone-950 shadow-sm transition hover:bg-amber-400 {{ $cartCount < 1 ? 'pointer-events-none opacity-40' : '' }}" aria-disabled="{{ $cartCount < 1 ? 'true' : 'false' }}">Lanjut ke pembayaran</a>
                     <p class="mt-2 text-center text-[11px] text-stone-500">Stok pilihan ditahan selama 10 menit.</p>
                 </div>
             </div>
@@ -88,7 +88,7 @@
         const menuCards = () => document.querySelectorAll('[data-menu-card]');
 
         function showToast(message, error = false) {
-            window.appToast(message, error ? 'error' : 'success', {duration: 3000});
+            window.appToast(message, error ? 'error' : 'success', {duration: 5000});
         }
 
         function renderCart(cart) {
@@ -106,8 +106,8 @@
             }
 
             selectedItems.innerHTML = cart.items.map(item => `
-                <div class="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-stone-200 p-3">
-                    <div class="item-image h-16 w-16 overflow-hidden rounded-md border border-stone-300 bg-stone-50"></div>
+                <div class="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50/50 p-3">
+                    <div class="item-image h-14 w-14 overflow-hidden rounded-xl border border-stone-200 bg-stone-50"></div>
                     <div class="min-w-0"><p class="item-name truncate text-sm font-bold"></p><p class="item-detail mt-1 text-xs text-stone-500"></p></div>
                     <div class="shrink-0 text-right">
                         <p class="item-subtotal text-sm font-black"></p>
@@ -184,7 +184,7 @@
             catalogVersion = data.version;
             applyCategoryFilter(selectedCategory);
             renderStocks(stocks);
-            window.appToast('Daftar menu telah diperbarui oleh admin.', 'info', {duration: 3000});
+            window.appToast('Daftar menu telah diperbarui oleh admin.', 'info', {duration: 5000});
         }
 
         async function syncStocks() {

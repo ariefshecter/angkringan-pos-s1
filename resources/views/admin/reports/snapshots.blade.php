@@ -1,17 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h1 class="text-2xl font-bold text-stone-900">Riwayat Rekap</h1>
-            <p class="mt-0.5 text-sm text-stone-500">Snapshot laporan harian dan bulanan yang disimpan Admin.</p>
+            <p class="ui-eyebrow">Reports archive</p>
+            <h1 class="mt-1 text-2xl font-black tracking-tight text-stone-950">Riwayat Rekap</h1>
+            <p class="mt-1 text-sm text-stone-500">Snapshot laporan harian dan bulanan yang disimpan Admin.</p>
         </div>
     </x-slot>
 
     <div class="py-8">
         <div class="mx-auto max-w-7xl space-y-5 px-4 sm:px-6 lg:px-8">
             <div class="flex justify-end">
-                <a href="{{ route('admin.reports.sales') }}" class="rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50">Kembali ke Laporan</a>
+                <a href="{{ route('admin.reports.sales') }}" class="ui-button-secondary">Kembali ke laporan</a>
             </div>
-            <section class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+            <section class="ui-surface overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200 text-sm">
                         <thead class="bg-stone-50 text-left text-xs uppercase tracking-wide text-stone-500">

@@ -27,6 +27,7 @@ class SalesReportTest extends TestCase
             ->get(route('admin.reports.sales', ['mode' => 'daily', 'date' => '2026-08-10']))
             ->assertOk()
             ->assertSee('Laporan Harian')
+            ->assertSee('logo.jpeg')
             ->assertViewHas('mode', 'daily')
             ->assertViewHas('date', '2026-08-10')
             ->assertViewHas('summary', fn (array $summary): bool => $summary === [
@@ -50,16 +51,66 @@ class SalesReportTest extends TestCase
 
         $this->activateDevice()
             ->actingAs($admin)
-            ->get(route('admin.reports.sales', ['mode' => 'monthly', 'month' => '2026-07']))
+            ->get(route('admin.reports.sales', ['mode' => 'monthly', 'month' => '2026-07', 'end_month' => '2026-07']))
             ->assertOk()
             ->assertSee('Laporan Bulanan')
             ->assertViewHas('mode', 'monthly')
             ->assertViewHas('month', '2026-07')
             ->assertViewHas('summary', fn (array $summary): bool => $summary['revenue'] === 200000
                 && $summary['transactions'] === 2)
-            ->assertViewHas('chartRows', fn ($rows): bool => $rows->count() === 31
+            ->assertViewHas('chartRows', fn ($rows): bool => $rows->count() === 1
                 && $rows->sum('revenue') === 200000
                 && $rows->sum('orders') === 2);
+    }
+
+    public function test_monthly_report_aggregates_by_month_for_the_selected_range(): void
+    {
+        $this->createTransaction('AGG-JULY', Transaction::PAYMENT_PAID, 80000, 'cash', '2026-07-10 10:00:00');
+        $this->createTransaction('AGG-AUGUST', Transaction::PAYMENT_PAID, 120000, 'midtrans', '2026-08-11 11:00:00');
+        $admin = Admin::factory()->create();
+
+        $response = $this->activateDevice()->actingAs($admin)
+            ->get(route('admin.reports.sales', ['mode' => 'monthly', 'month' => '2026-07', 'end_month' => '2026-08']))
+            ->assertOk()
+            ->assertViewHas('mode', 'monthly')
+            ->assertViewHas('month', '2026-07')
+            ->assertViewHas('endMonth', '2026-08');
+
+        $response->assertViewHas('chartRows', function ($rows): bool {
+            return $rows->count() === 2
+                && $rows->where('revenue', 80000)->first()['label'] === 'Jul 2026'
+                && $rows->where('revenue', 120000)->first()['label'] === 'Agt 2026';
+        });
+    }
+
+    public function test_daily_report_supports_a_historical_date_range(): void
+    {
+        $this->createTransaction('RANGE-FIRST', Transaction::PAYMENT_PAID, 50000, 'cash', '2026-06-03 08:00:00');
+        $this->createTransaction('RANGE-LAST', Transaction::PAYMENT_PAID, 70000, 'midtrans', '2026-06-05 16:00:00');
+        $this->createTransaction('RANGE-OUTSIDE', Transaction::PAYMENT_PAID, 900000, 'cash', '2026-06-06 10:00:00');
+        $admin = Admin::factory()->create();
+
+        $this->activateDevice()->actingAs($admin)
+            ->get(route('admin.reports.sales', [
+                'mode' => 'daily',
+                'date' => '2026-06-03',
+                'end_date' => '2026-06-05',
+            ]))
+            ->assertOk()
+            ->assertViewHas('date', '2026-06-03')
+            ->assertViewHas('endDate', '2026-06-05')
+            ->assertViewHas('summary.transactions', 2)
+            ->assertViewHas('summary.revenue', 120000)
+            ->assertViewHas('chartRows', fn ($rows): bool => $rows->count() === 3);
+    }
+
+    public function test_weekly_mode_is_no_longer_supported(): void
+    {
+        $admin = Admin::factory()->create();
+
+        $this->activateDevice()->actingAs($admin)
+            ->get(route('admin.reports.sales', ['mode' => 'weekly', 'week' => '2026-08-12']))
+            ->assertSessionHasErrors('mode');
     }
 
     public function test_admin_can_create_and_update_snapshot_for_the_same_period(): void

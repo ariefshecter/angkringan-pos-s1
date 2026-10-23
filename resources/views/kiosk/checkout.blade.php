@@ -7,9 +7,9 @@
         $selectedPaymentMethod = old('payment_method', $editingPaymentMethod ?? 'cash');
         $selectedPaymentChannel = old('payment_channel', $editingPaymentChannel ?? null);
     @endphp
-    <div class="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-5">
-        <section class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm lg:col-span-2">
-            <h2 class="text-lg font-bold">Ringkasan</h2>
+    <div class="mx-auto grid max-w-6xl gap-6 px-4 py-7 sm:px-6 lg:grid-cols-5 lg:py-10">
+        <section class="ui-surface h-fit p-5 sm:p-6 lg:col-span-2">
+            <p class="ui-eyebrow">Order summary</p><h2 class="mt-1 text-xl font-black">{{ $editingOrder ? 'Perbarui pesanan' : 'Ringkasan pesanan' }}</h2>
             <div class="mt-4 divide-y divide-stone-100">
                 @foreach($items as $item)
                     <div class="flex justify-between gap-3 py-3 text-sm">
@@ -24,9 +24,9 @@
             </div>
         </section>
 
-        <form method="POST" action="{{ route('kiosk.checkout.store') }}" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-3">
+        <form method="POST" action="{{ route('kiosk.checkout.store') }}" class="ui-surface p-5 sm:p-7 lg:col-span-3">
             @csrf
-            <h1 class="text-2xl font-bold">Data dan Pembayaran</h1>
+            <p class="ui-eyebrow">Checkout</p><h1 class="mt-1 text-2xl font-black tracking-tight">Data dan pembayaran</h1><p class="mt-2 text-sm text-stone-500">Lengkapi data pelanggan dan pilih cara pembayaran yang paling nyaman.</p>
             @if($errors->has('cart'))
                 <p class="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ $errors->first('cart') }}</p>
             @endif
@@ -39,19 +39,19 @@
                 </div>
 
                 <fieldset>
-                    <legend class="mb-3 text-sm font-medium text-stone-700">Metode pembayaran</legend>
+                    <legend class="ui-eyebrow mb-3">Metode pembayaran</legend>
                     <div class="grid gap-3 sm:grid-cols-3">
-                        <label class="cursor-pointer rounded-xl border border-stone-300 p-4 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
+                        <label class="cursor-pointer rounded-2xl border border-stone-200 bg-stone-50/40 p-4 transition hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
                             <input type="radio" name="payment_method" value="cash" class="text-amber-600 focus:ring-amber-500" @checked($selectedPaymentMethod === 'cash')>
                             <span class="ml-2 font-semibold">Tunai</span>
                             <p class="mt-1 pl-6 text-xs text-stone-500">Bayar ke kasir</p>
                         </label>
-                        <label class="cursor-pointer rounded-xl border border-stone-300 p-4 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
+                        <label class="cursor-pointer rounded-2xl border border-stone-200 bg-stone-50/40 p-4 transition hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
                             <input type="radio" name="payment_method" value="qris" class="text-amber-600 focus:ring-amber-500" @checked($selectedPaymentMethod === 'qris')>
                             <span class="ml-2 font-semibold">QRIS (Auto)</span>
                             <p class="mt-1 pl-6 text-xs text-stone-500">Langsung QRIS</p>
                         </label>
-                        <label data-bank-method-card class="cursor-pointer rounded-xl border border-stone-300 p-4 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
+                        <label data-bank-method-card class="cursor-pointer rounded-2xl border border-stone-200 bg-stone-50/40 p-4 transition hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
                             <input type="radio" name="payment_method" value="bank_transfer" class="text-amber-600 focus:ring-amber-500" @checked($selectedPaymentMethod === 'bank_transfer')>
                             <span class="ml-2 font-semibold">Transfer Bank</span>
                             <p id="selected-bank-summary" class="mt-1 pl-6 text-xs text-stone-500">Virtual Account</p>
@@ -94,16 +94,16 @@
 
                 <div>
                     <x-input-label for="notes" value="Catatan pesanan (opsional)" />
-                    <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full rounded-md border-stone-300 focus:border-amber-500 focus:ring-amber-500">{{ old('notes', $editingNotes ?? '') }}</textarea>
+                    <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full rounded-xl border-stone-300 bg-stone-50/60 px-4 py-3 text-sm focus:border-amber-500 focus:bg-white focus:ring-amber-500">{{ old('notes', $editingNotes ?? '') }}</textarea>
                 </div>
 
-                <button class="w-full rounded-xl bg-amber-500 px-4 py-3 font-bold text-white hover:bg-amber-600">{{ $editingOrder ? 'Perbarui pembayaran' : 'Buat pesanan' }}</button>
+                    <button class="ui-button-accent w-full py-3.5">{{ $editingOrder ? 'Perbarui pembayaran' : 'Buat pesanan' }}</button>
             </div>
         </form>
 
         <form id="discard-checkout-form" method="POST" action="{{ $editingOrder ? route('kiosk.orders.cancel-order', $editingOrder) : route('kiosk.cart.clear') }}" class="lg:col-start-3 lg:col-span-3" data-confirm="{{ $editingOrder ? 'Pesanan akan dibatalkan sepenuhnya dan stok akan dikembalikan.' : 'Semua produk akan dihapus dari pesanan dan stok akan dikembalikan.' }} Lanjutkan?" data-confirm-title="Batalkan pesanan" data-confirm-button="Ya, batalkan">
             @csrf
-            <button type="submit" class="w-full rounded-xl border border-red-300 bg-white px-4 py-3 font-bold text-red-600 transition hover:bg-red-600 hover:text-white">{{ $editingOrder ? 'Batalkan pesanan ini' : 'Batalkan pesanan' }}</button>
+            <button type="submit" class="ui-button-danger w-full">{{ $editingOrder ? 'Batalkan pesanan ini' : 'Batalkan pesanan' }}</button>
         </form>
     </div>
 @endsection

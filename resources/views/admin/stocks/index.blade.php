@@ -1,13 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1 class="text-2xl font-bold text-stone-900">Stok Menu</h1>
+        <p class="ui-eyebrow">Inventory monitor</p>
+        <h1 class="mt-1 text-2xl font-black tracking-tight text-stone-950">Stok menu</h1>
         <p class="text-sm text-stone-500">Pantau stok yang tersedia secara real-time. Halaman ini hanya dapat digunakan untuk melihat data.</p>
     </x-slot>
 
     <div class="py-8">
         <div class="mx-auto max-w-7xl space-y-5 px-4 sm:px-6 lg:px-8">
             <section id="stock-live" class="space-y-5" aria-live="polite" data-feed-url="{{ route('admin.stocks.feed') }}">
-                <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
+                <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
                     <span class="flex items-center gap-2 font-semibold">
                         <span class="relative flex h-3 w-3">
                             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -18,7 +19,7 @@
                     <span id="stock-updated-at">Memuat data stok...</span>
                 </div>
 
-                <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                <div class="ui-surface overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-stone-200 text-sm">
                             <thead class="bg-stone-50 text-left text-xs uppercase text-stone-500">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
@@ -23,8 +24,8 @@ class StockController extends Controller
         ]);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Collection<int, Menu> */
-    private function menus(): \Illuminate\Database\Eloquent\Collection
+    /** @return Collection<int, Menu> */
+    private function menus(): Collection
     {
         return Menu::query()
             ->with('category:id,name')

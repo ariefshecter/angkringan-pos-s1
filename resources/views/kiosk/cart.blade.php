@@ -3,12 +3,12 @@
 @section('title', 'Keranjang Belanja')
 
 @section('cart')
-    <a href="{{ route('kiosk.index') }}" class="rounded-lg border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100">Kembali ke Menu</a>
+    <a href="{{ route('kiosk.index') }}" class="rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs font-bold text-stone-700 transition hover:border-amber-400 hover:bg-amber-50">Kembali ke menu</a>
 @endsection
 
 @section('content')
     <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 class="mb-6 text-xl font-black uppercase tracking-tight text-stone-950">Keranjang Belanja</h1>
+        <div class="mb-7"><p class="ui-eyebrow">Your selection</p><h1 class="mt-1 text-3xl font-black tracking-tight text-stone-950">Keranjang belanja</h1><p class="mt-2 text-sm text-stone-500">Tinjau pilihan Anda sebelum melanjutkan ke pembayaran.</p></div>
 
         @if($errors->any())
             <div class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -18,19 +18,19 @@
         @endif
 
         @if($items->isEmpty())
-            <div class="rounded-xl border border-stone-200 bg-white p-12 text-center shadow-sm">
+            <div class="ui-surface p-12 text-center">
                 <p class="text-stone-500">Keranjang masih kosong.</p>
-                <a class="mt-4 inline-block rounded-lg bg-stone-900 px-5 py-3 text-sm font-bold text-white" href="{{ route('kiosk.index') }}">Pilih Menu</a>
+                <a class="ui-button-accent mt-5" href="{{ route('kiosk.index') }}">Pilih menu</a>
             </div>
         @else
             <form id="checkout-form" method="POST" action="{{ route('kiosk.checkout.store') }}">@csrf</form>
 
             <div class="grid items-start gap-7 lg:grid-cols-2">
                 <div class="space-y-5">
-                    <section class="overflow-hidden rounded-xl border border-stone-200 bg-white px-4 shadow-sm">
+                    <section class="ui-surface overflow-hidden px-4">
                         @foreach($items as $item)
                             <article class="flex items-center gap-3 border-b border-stone-100 py-4 last:border-b-0">
-                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-md border border-stone-400 bg-stone-50">
+                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
                                     @if($item['menu']->image_path)
                                         <img src="{{ Storage::url($item['menu']->image_path) }}" alt="{{ $item['menu']->name }}" class="h-full w-full object-cover">
                                     @else
@@ -46,8 +46,8 @@
 
                                 <div class="shrink-0 text-right">
                                     <form method="POST" action="{{ route('kiosk.cart.update', $item['menu']) }}" class="flex items-center justify-end gap-1">@csrf @method('PATCH')
-                                        <input name="quantity" type="number" min="0" max="{{ $item['max_quantity'] }}" value="{{ $item['quantity'] }}" class="h-8 w-14 rounded border-stone-300 p-1 text-center text-xs focus:border-stone-700 focus:ring-stone-700" aria-label="Jumlah {{ $item['menu']->name }}">
-                                        <button class="h-8 rounded border border-stone-300 px-2 text-[10px] font-semibold hover:bg-stone-100">Ubah</button>
+                                        <input name="quantity" type="number" min="0" max="{{ $item['max_quantity'] }}" value="{{ $item['quantity'] }}" class="h-9 w-16 rounded-xl border-stone-300 p-1 text-center text-xs focus:border-amber-500 focus:ring-amber-500" aria-label="Jumlah {{ $item['menu']->name }}">
+                                        <button class="h-9 rounded-xl border border-stone-300 px-3 text-[10px] font-bold transition hover:border-amber-400 hover:bg-amber-50">Ubah</button>
                                     </form>
                                     <p class="mt-2 text-xs font-medium">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</p>
                                     <form method="POST" action="{{ route('kiosk.cart.destroy', $item['menu']) }}" class="mt-1">@csrf @method('DELETE')<button class="text-[10px] font-semibold text-red-600 hover:underline">Hapus</button></form>
@@ -56,32 +56,32 @@
                         @endforeach
                     </section>
 
-                    <section class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
-                        <h2 class="text-base font-black">Formulir Pelanggan</h2>
+                    <section class="ui-surface p-5 sm:p-6">
+                        <p class="ui-eyebrow">Customer details</p><h2 class="mt-1 text-base font-black">Formulir pelanggan</h2>
                         <div class="mt-4 space-y-4">
                             <div>
                                 <label for="customer_name" class="text-xs font-medium text-stone-700">Nama Pelanggan <span class="text-red-600">(Wajib)</span></label>
-                                <input form="checkout-form" id="customer_name" name="customer_name" value="{{ old('customer_name') }}" required maxlength="100" placeholder="NAMA PELANGGAN" class="mt-1 block w-full rounded border-stone-400 text-sm uppercase focus:border-stone-800 focus:ring-stone-800">
+                                <input form="checkout-form" id="customer_name" name="customer_name" value="{{ old('customer_name') }}" required maxlength="100" placeholder="NAMA PELANGGAN" class="mt-1 block w-full rounded-xl border-stone-300 bg-stone-50/60 text-sm uppercase focus:border-amber-500 focus:bg-white focus:ring-amber-500">
                             </div>
                             <div>
                                 <label for="notes" class="text-xs font-medium text-stone-700">Catatan Pesanan <span class="text-stone-400">(Opsional)</span></label>
-                                <textarea form="checkout-form" id="notes" name="notes" rows="2" maxlength="500" placeholder="Contoh: tidak pedas" class="mt-1 block w-full rounded border-stone-300 text-sm focus:border-stone-800 focus:ring-stone-800">{{ old('notes') }}</textarea>
+                                <textarea form="checkout-form" id="notes" name="notes" rows="2" maxlength="500" placeholder="Contoh: tidak pedas" class="mt-1 block w-full rounded-xl border-stone-300 bg-stone-50/60 text-sm focus:border-amber-500 focus:bg-white focus:ring-amber-500">{{ old('notes') }}</textarea>
                             </div>
                         </div>
                     </section>
                 </div>
 
                 <div class="space-y-5">
-                    <section class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
-                        <h2 class="text-base font-black uppercase">Ringkasan Pemesanan</h2>
+                    <section class="ui-surface p-5 sm:p-6">
+                        <p class="ui-eyebrow">Order total</p><h2 class="mt-1 text-base font-black">Ringkasan pemesanan</h2>
                         <div class="mt-4 flex items-center justify-between text-sm"><span>Subtotal</span><span>Rp {{ number_format($total, 0, ',', '.') }}</span></div>
                         <div class="mt-8 flex items-center justify-between border-t border-stone-200 pt-5 text-xl font-black"><span>Total Pembayaran</span><span>Rp {{ number_format($total, 0, ',', '.') }}</span></div>
                     </section>
 
                     <section>
-                        <h2 class="mb-3 text-base font-black uppercase">Pilih Metode Pembayaran</h2>
+                        <p class="ui-eyebrow mb-1">Payment method</p><h2 class="mb-3 text-base font-black">Pilih metode pembayaran</h2>
                         <div class="grid grid-cols-2 gap-4">
-                            <label class="relative min-h-48 cursor-pointer rounded-xl border border-stone-300 bg-white p-5 shadow-sm transition has-[:checked]:border-amber-600 has-[:checked]:ring-2 has-[:checked]:ring-amber-200">
+                            <label class="relative min-h-48 cursor-pointer rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50/50 has-[:checked]:ring-2 has-[:checked]:ring-amber-200">
                                 <input form="checkout-form" type="radio" name="payment_method" value="cash" class="absolute left-4 top-4 text-amber-600 focus:ring-amber-500" @checked(old('payment_method', 'cash') === 'cash')>
                                 <div class="flex h-full flex-col items-center justify-center text-center">
                                     <p class="text-xs font-black uppercase">Cash (Tunai di Kasir)</p>
@@ -90,7 +90,7 @@
                                 </div>
                             </label>
 
-                            <label class="relative min-h-48 cursor-pointer rounded-xl border border-stone-300 bg-white p-5 shadow-sm transition has-[:checked]:border-amber-600 has-[:checked]:ring-2 has-[:checked]:ring-amber-200">
+                            <label class="relative min-h-48 cursor-pointer rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50/50 has-[:checked]:ring-2 has-[:checked]:ring-amber-200">
                                 <input form="checkout-form" type="radio" name="payment_method" value="qris" class="absolute left-4 top-4 text-amber-600 focus:ring-amber-500" @checked(old('payment_method') === 'qris')>
                                 <div class="flex h-full flex-col items-center justify-center text-center">
                                     <p class="text-xs font-black uppercase">Digital (QRIS / Midtrans)</p>
@@ -101,12 +101,12 @@
                         </div>
                     </section>
 
-                    <button form="checkout-form" class="w-full rounded border border-stone-900 bg-white px-5 py-4 text-sm font-black uppercase tracking-wide text-stone-950 transition hover:bg-stone-900 hover:text-white">
+                    <button form="checkout-form" class="ui-button-accent w-full py-4 uppercase tracking-wide">
                         Lengkapi Pesanan
                     </button>
                     <form method="POST" action="{{ route('kiosk.cart.clear') }}" data-confirm="Semua produk akan dihapus dari pesanan dan stok akan dikembalikan. Lanjutkan?" data-confirm-title="Batalkan pesanan" data-confirm-button="Ya, batalkan">
                         @csrf
-                        <button type="submit" class="w-full rounded border border-red-300 bg-white px-5 py-4 text-sm font-black uppercase tracking-wide text-red-600 transition hover:bg-red-600 hover:text-white">Batalkan pesanan</button>
+                        <button type="submit" class="ui-button-danger w-full py-4 uppercase tracking-wide">Batalkan pesanan</button>
                     </form>
                 </div>
             </div>
